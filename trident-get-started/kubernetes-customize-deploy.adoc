@@ -1,0 +1,117 @@
+---
+sidebar: sidebar 
+permalink: trident-get-started/kubernetes-customize-deploy.html 
+keywords: deploy, trident, methods, operator, tridentctl, helm, attributes, customize, tridentorchestrator 
+summary: 'Trident 연산자를 사용하면 의 특성을 사용하여 Astra Trident가 설치되는 방식을 사용자 지정할 수 있습니다 `TridentOrchestrator` 사양' 
+---
+= Trident 운영자 배포를 사용자 지정합니다
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+Trident 연산자를 사용하면 의 특성을 사용하여 Astra Trident가 설치되는 방식을 사용자 지정할 수 있습니다 `TridentOrchestrator` 사양
+
+속성 목록은 다음 표를 참조하십시오.
+
+[cols="3"]
+|===
+| 매개 변수 | 설명 | 기본값 
+
+
+| `namespace` | Astra Trident를 설치할 네임스페이스입니다 | "기본값" 
+
+
+| `debug` | Astra Trident에 대한 디버깅을 활성화합니다 | 거짓 
+
+
+| `IPv6` | IPv6를 통해 Astra Trident를 설치합니다 | 거짓 
+
+
+| `k8sTimeout` | Kubernetes 작업 시간이 초과되었습니다 | 30초 
+
+
+| `silenceAutosupport` | AutoSupport 번들을 NetApp에 자동으로 보내지 않습니다 | 거짓 
+
+
+| `enableNodePrep` | 작업자 노드 종속성 자동 관리(* beta*) | 거짓 
+
+
+| `autosupportImage` | AutoSupport 텔레메트리 컨테이너 이미지입니다 | "NetApp/트리덴트 - 자동 지원: 21.04.0" 
+
+
+| `autosupportProxy` | AutoSupport 텔레메트리 전송을 위한 프록시의 주소/포트입니다 | "http://proxy.example.com:8888"[] 
+
+
+| `uninstall` | Astra Trident를 제거하는 데 사용되는 플래그입니다 | 거짓 
+
+
+| `logFormat` | 사용할 Astra Trident 로깅 형식[text,json] | "텍스트" 
+
+
+| `tridentImage` | 설치할 Astra Trident 이미지 | "NetApp/트리덴트: 21.04" 
+
+
+| `imageRegistry` | 형식의 내부 레지스트리 경로입니다
+`<registry FQDN>[:port][/subpath]` | "k8s.gcr.io/sig-storage(k8s 1.19 이상) 또는 quay.io/k8scsi" 
+
+
+| `kubeletDir` | 호스트의 kubelet 디렉토리에 대한 경로입니다 | “/var/lib/kubelet” 
+
+
+| `wipeout` | Astra Trident를 완전히 제거하기 위해 삭제할 리소스 목록입니다 |  
+
+
+| `imagePullSecrets` | 내부 레지스트리에서 이미지를 가져올 수 있는 비밀 |  
+
+
+| `controllerPluginNodeSelector` | Trident 컨트롤러 CSI 플러그인을 실행하는 Pod용 추가 노드 선택기. pod.spec.nodeSelector 과 동일한 형식을 따릅니다. | 기본값 없음, 선택 사항 
+
+
+| `controllerPluginTolerations` | Trident 컨트롤러 CSI 플러그인을 실행하는 Pod의 허용 설정을 재정의합니다. pod.spec.Tolerations와 같은 형식을 따릅니다. | 기본값 없음, 선택 사항 
+
+
+| `nodePluginNodeSelector` | Trident Node CSI 플러그인을 실행하는 Pod용 추가 노드 선택기 pod.spec.nodeSelector 과 동일한 형식을 따릅니다. | 기본값 없음, 선택 사항 
+
+
+| `nodePluginTolerations` | Trident Node CSI 플러그인을 실행하는 Pod의 허용 설정을 재정의합니다. pod.spec.Tolerations와 같은 형식을 따릅니다. | 기본값 없음, 선택 사항 
+|===
+
+IMPORTANT: `spec.namespace` 에 지정됩니다 `TridentOrchestrator` 어떤 Namespace Astra Trident가 에 설치되어 있는지 나타냅니다. Astra Trident가 설치된 후에는 이 매개 변수 * 를 업데이트할 수 없습니다. 이렇게 하면 의 상태가 됩니다 `TridentOrchestrator` 를 눌러 로 변경합니다 `Failed`. Astra Trident는 네임스페이스 간에 마이그레이션할 수 없습니다.
+
+
+TIP: 포드 매개 변수 포맷에 대한 자세한 내용은 을 참조하십시오 link:https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/["노드에 Pod 할당"^].
+
+정의할 때 위에서 언급한 속성을 사용할 수 있습니다 `TridentOrchestrator` 를 눌러 설치를 사용자 정의합니다. 예를 들면 다음과 같습니다.
+
+[listing]
+----
+cat deploy/crds/tridentorchestrator_cr_imagepullsecrets.yaml
+apiVersion: trident.netapp.io/v1
+kind: TridentOrchestrator
+metadata:
+  name: trident
+spec:
+  debug: true
+  namespace: trident
+  imagePullSecrets:
+  - thisisasecret
+----
+다음은 노드 선택기를 사용하여 Trident를 구축하는 방법을 보여 주는 또 다른 예입니다.
+
+[listing]
+----
+apiVersion: trident.netapp.io/v1
+kind: TridentOrchestrator
+metadata:
+  name: trident
+spec:
+  debug: true
+  namespace: trident
+  controllerPluginNodeSelector:
+    nodetype: master
+  nodePluginNodeSelector:
+    storage: netapp
+----
+설치를 사용자 지정하려는 경우 `TridentOrchestrator` 인수를 사용하면 사용을 고려해야 합니다 `tridentctl` 필요에 따라 수정할 수 있는 사용자 지정 YAML 매니페스트를 생성합니다.

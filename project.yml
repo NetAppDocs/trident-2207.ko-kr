@@ -1,0 +1,54 @@
+---
+settings:
+  name: Astra Trident
+  platform: ''
+  internal:
+    pdf_enabled: true
+  prod:
+    pdf_enabled: true
+    harmony_enabled: false
+  rss_page: trident-rn.html
+  versions:
+  - name: 아스트라 트리덴트
+    url: "/trident-2207"
+    version-number: '22.07'
+  - name: 아스트라 트리덴트
+    url: "/trident"
+    version-number: latest
+  - name: 아스트라 트리덴트
+    url: "/trident-2204"
+    version-number: '22.04'
+  - name: 아스트라 트리덴트
+    url: "/trident-2201"
+    version-number: '22.01'
+  - name: 아스트라 트리덴트
+    url: "/trident-2110"
+    version-number: '21.10'
+  langs: ko-kr,us-en,ja-jp,zh-cn,zh-tw
+sidebar:
+  entries:
+  - title: Astra Trident 문서
+    url: "/index.html"
+  - title: 릴리스 정보
+    url: "/trident-rn.html"
+  - section: trident-concepts
+  - section: trident-get-started
+  - section: trident-managing-k8s
+  - section: trident-use
+  - section: trident-docker
+  - title: FAQ 를 참조하십시오
+    url: "/faq.html"
+  - title: 지원
+    url: "/get-help.html"
+  - title: 문제 해결
+    url: "/troubleshooting.html"
+  - section: trident-reco
+  - section: trident-reference
+  - title: 이전 버전
+    url: "/earlier-versions.html"
+  - title: 법적 고지
+    url: "/legal.html"
+product-family:
+  name: Astra
+  repo: astra-family
+  sidebar_label: 모든 Astra 문서

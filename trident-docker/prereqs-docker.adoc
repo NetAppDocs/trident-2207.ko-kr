@@ -1,0 +1,111 @@
+---
+sidebar: sidebar 
+permalink: trident-docker/prereqs-docker.html 
+keywords: deploy, astra trident, docker, trident for docker, nfs, iscsi, protcol, nfs protocol, iscsi protocol, configure host, host config 
+summary: Astra Trident를 구축하기 전에 호스트에 필수 프로토콜 사전 요구 사항을 설치하고 구성해야 합니다. 
+---
+= 배포를 위한 사전 요구 사항
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+Astra Trident를 구축하기 전에 호스트에 필수 프로토콜 사전 요구 사항을 설치하고 구성해야 합니다.
+
+* 배포가 모든 를 충족하는지 확인합니다 link:../trident-get-started/requirements.html["요구 사항"^].
+* 지원되는 버전의 Docker가 설치되어 있는지 확인합니다. Docker 버전이 오래되었으면 https://docs.docker.com/engine/install/["설치 또는 업데이트합니다"^].
+
+
+[listing]
+----
+docker --version
+----
+* 프로토콜 사전 요구 사항이 호스트에 설치 및 구성되어 있는지 확인합니다.
+
+
+[cols="3*"]
+|===
+| 프로토콜 | 운영 체제 | 명령 
+
+
+| NFS 를 참조하십시오  a| 
+RHEL/CentOS 7
+ a| 
+`sudo yum install -y nfs-utils`
+
+
+
+| NFS 를 참조하십시오  a| 
+우분투
+ a| 
+`sudo apt-get install -y nfs-common`
+
+
+
+| iSCSI  a| 
+RHEL/CentOS 7
+ a| 
+. 다음 시스템 패키지를 설치합니다.
++
+`sudo yum install -y lsscsi iscsi-initiator-utils sg3_utils device-mapper-multipath`
+
+. 다중 경로 데몬을 시작합니다.
++
+`sudo mpathconf --enable --with_multipathd y`
+
+. 확인하십시오 `iscsid` 및 `multipathd` 활성화 및 실행:
++
+`sudo systemctl enable iscsid multipathd`
+`sudo systemctl start iscsid multipathd`
+
+. iSCSI 타겟 검색:
++
+`sudo iscsiadm -m discoverydb -t st -p <DATA_LIF_IP> --discover`
+
+. 검색된 iSCSI 대상에 로그인합니다.
++
+`sudo iscsiadm -m node -p <DATA_LIF_IP> --login`
+
+. 활성화 및 시작 `iscsi`:
++
+`sudo systemctl enable iscsi`
+`sudo systemctl start iscsi`
+
+
+
+
+
+| iSCSI  a| 
+우분투
+ a| 
+. 다음 시스템 패키지를 설치합니다.
++
+`sudo apt-get install -y open-iscsi lsscsi sg3-utils multipath-tools scsitools`
+
+. 다중 경로 설정:
++
+`sudo tee /etc/multipath.conf <<-'EOF'
+defaults {
+    user_friendly_names yes
+    find_multipaths yes
+}
+EOF
+sudo service multipath-tools restart`
+
+. 확인하십시오 `iscsid` 및 `multipathd` 실행 중:
++
+`sudo service open-iscsi start
+sudo service multipath-tools start`
+
+. iSCSI 타겟 검색:
++
+`sudo iscsiadm -m discoverydb -t st -p <DATA_LIF_IP> --discover`
+
+. 검색된 iSCSI 대상에 로그인합니다.
++
+`sudo iscsiadm -m node -p <DATA_LIF_IP> --login`
+
+
+
+|===

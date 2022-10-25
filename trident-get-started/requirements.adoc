@@ -1,0 +1,244 @@
+---
+sidebar: sidebar 
+permalink: trident-get-started/requirements.html 
+keywords: trident requirements, supported front ends, supported backends, kubernetes cluster, cluster requirements, version requirements, supported versions, host configuration, host os, system configuration, host operating system, fsx 
+summary: 지원되는 프런트엔드, 백엔드 및 호스트 구성을 검토하여 시작하십시오. 
+---
+= 요구 사항
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+지원되는 프런트엔드, 백엔드 및 호스트 구성을 검토하여 시작하십시오.
+
+
+NOTE: Astra Trident가 사용하는 포트에 대한 자세한 내용은 를 참조하십시오 link:../trident-reference/trident-ports.html["여기"^].
+
+
+
+== 지원되는 프런트엔드(오케스트레이터)
+
+Astra Trident는 다음을 비롯한 여러 컨테이너 엔진과 오케스트레이터가 지원됩니다.
+
+* Anthos On-Premise(VMware) 및 Anthos의 Bare Metal 1.9, 1.10, 1.11
+* Kubernetes 1.19-1.24
+* Mirantis Kubernetes 엔진 3.5
+* OpenShift 4.8, 4.9, 4.10, 4.11
+
+
+Trident 연산자는 다음 릴리즈에서 지원됩니다.
+
+* Anthos On-Premise(VMware) 및 Anthos의 Bare Metal 1.9, 1.10, 1.11
+* Kubernetes 1.19-1.24
+* OpenShift 4.8, 4.9, 4.10, 4.11
+
+
+Astra Trident는 GKE(Google Kubernetes Engine), EKS(Amazon Elastic Kubernetes Service), AKS(Azure Kubernetes Service), Rancher, VMware Tanzu Portfolio를 비롯한 기타 완전 관리형 및 자체 관리 Kubernetes 오퍼링과도 작동합니다.
+
+
+
+== 지원되는 백엔드(스토리지)
+
+Astra Trident를 사용하려면 다음 중 하나 이상의 지원되는 백엔드가 필요합니다.
+
+* NetApp ONTAP용 Amazon FSx
+* Azure NetApp Files
+* Cloud Volumes ONTAP
+* GCP용 Cloud Volumes Service
+* FAS/AFF/9.3 이상을 선택합니다
+* NetApp All SAN 어레이(ASA)
+* NetApp HCI/Element 소프트웨어 11 이상
+
+
+
+
+== 피처 요구 사항
+
+아래 표에는 Astra Trident의 이번 릴리즈와 함께 사용할 수 있는 기능과 지원하는 Kubernetes 버전이 요약되어 있습니다.
+
+[cols="3"]
+|===
+| 피처 | Kubernetes 버전 | 기능 게이트가 필요합니까? 
+
+
+| CSI Trident  a| 
+1.19-1.24
+ a| 
+아니요
+
+
+
+| 볼륨 스냅샷  a| 
+1.19-1.24
+ a| 
+아니요
+
+
+
+| 체적 스냅샷의 PVC  a| 
+1.19-1.24
+ a| 
+아니요
+
+
+
+| iSCSI PV 크기 조정  a| 
+1.19-1.24
+ a| 
+아니요
+
+
+
+| ONTAP 양방향 CHAP  a| 
+1.19-1.24
+ a| 
+아니요
+
+
+
+| 동적 내보내기 정책  a| 
+1.19-1.24
+ a| 
+아니요
+
+
+
+| Trident 연산자  a| 
+1.19-1.24
+ a| 
+아니요
+
+
+
+| Auto Worker Node Prep(베타)  a| 
+1.19-1.24
+ a| 
+아니요
+
+
+
+| CSI 토폴로지  a| 
+1.19-1.24
+ a| 
+아니요
+
+|===
+
+
+== 호스트 운영 체제를 테스트했습니다
+
+기본적으로 Astra Trident는 컨테이너에서 실행되므로 모든 Linux 작업자에서 실행됩니다. 그러나 이러한 작업자들은 표준 NFS 클라이언트 또는 iSCSI 이니시에이터를 사용하여 Astra Trident가 제공하는 볼륨을 사용 중인 백엔드에 따라 마운트할 수 있어야 합니다.
+
+Astra Trident는 공식적으로 특정 운영 체제를 "지원"하지 않지만 다음과 같은 Linux 배포판이 작동하는 것으로 알려져 있습니다.
+
+* OpenShift Container Platform에서 지원하는 RedHat CoreOS(RHCOS) 버전
+* RHEL 또는 CentOS 7
+* Ubuntu 18.04 이상(최신 22.04)
+
+
+를 클릭합니다 `tridentctl` 이 유틸리티는 이러한 Linux 배포판에서도 실행됩니다.
+
+
+
+== 호스트 구성
+
+사용 중인 백엔드에 따라 NFS 및/또는 iSCSI 유틸리티를 클러스터의 모든 작업자에 설치해야 합니다. 을 참조하십시오 link:../trident-use/worker-node-prep.html["여기"^] 를 참조하십시오.
+
+
+
+== 스토리지 시스템 구성
+
+Astra Trident는 백엔드 구성에서 사용하기 전에 스토리지 시스템을 일부 변경해야 할 수 있습니다. 을 참조하십시오 link:../trident-use/backends.html["여기"^] 를 참조하십시오.
+
+
+
+== 컨테이너 이미지 및 해당 Kubernetes 버전
+
+공기 박형 설치의 경우 다음 목록은 Astra Trident를 설치하는 데 필요한 컨테이너 이미지의 참조입니다. 를 사용합니다 `tridentctl images` 명령을 사용하여 필요한 컨테이너 이미지 목록을 확인합니다.
+
+[cols="2"]
+|===
+| Kubernetes 버전 | 컨테이너 이미지 
+
+
+| v1.19.0  a| 
+* NetApp/트리덴트: 22.07.0
+* NetApp/트리덴트 - 자동 지원: 22.07
+* K8s.GCR.IO/SIG-스토리지/CSI-공급자:v2.2.2
+* K8s.GCR.IO/SIG-storage/CSI-attacher:v3.5.0
+* k8s.gcr.io/sig-storage/scsi-resizer: v1.5.0
+* K8s.GCR.IO/SIG-storage/CSI-snapshotter:v3.0.3
+* K8s.GCR.IO/SIG-storage/CSI-node-driver-registrar: v2.5.1
+* NetApp/트리덴트 - 운영자: 22.07.0(선택 사항)
+
+
+
+
+| v1.20.0  a| 
+* NetApp/트리덴트: 22.07.0
+* NetApp/트리덴트 - 자동 지원: 22.07
+* K8s.GCR.IO/SIG-스토리지/CSI-공급자:v3.2.1
+* K8s.GCR.IO/SIG-storage/CSI-attacher:v3.5.0
+* k8s.gcr.io/sig-storage/scsi-resizer: v1.5.0
+* K8s.GCR.IO/SIG-storage/CSI-snapshotter:v6.0.1
+* K8s.GCR.IO/SIG-storage/CSI-node-driver-registrar: v2.5.1
+* NetApp/트리덴트 - 운영자: 22.07.0(선택 사항)
+
+
+
+
+| v1.21.0  a| 
+* NetApp/트리덴트: 22.07.0
+* NetApp/트리덴트 - 자동 지원: 22.07
+* K8s.GCR.IO/SIG-스토리지/CSI-공급자:v3.2.1
+* K8s.GCR.IO/SIG-storage/CSI-attacher:v3.5.0
+* k8s.gcr.io/sig-storage/scsi-resizer: v1.5.0
+* K8s.GCR.IO/SIG-storage/CSI-snapshotter:v6.0.1
+* K8s.GCR.IO/SIG-storage/CSI-node-driver-registrar: v2.5.1
+* NetApp/트리덴트 - 운영자: 22.07.0(선택 사항)
+
+
+
+
+| v1.22.0  a| 
+* NetApp/트리덴트: 22.07.0
+* NetApp/트리덴트 - 자동 지원: 22.07
+* K8s.GCR.IO/SIG-스토리지/CSI-공급자:v3.2.1
+* K8s.GCR.IO/SIG-storage/CSI-attacher:v3.5.0
+* k8s.gcr.io/sig-storage/scsi-resizer: v1.5.0
+* K8s.GCR.IO/SIG-storage/CSI-snapshotter:v6.0.1
+* K8s.GCR.IO/SIG-storage/CSI-node-driver-registrar: v2.5.1
+* NetApp/트리덴트 - 운영자: 22.07.0(선택 사항)
+
+
+
+
+| v1.23.0  a| 
+* NetApp/트리덴트: 22.07.0
+* NetApp/트리덴트 - 자동 지원: 22.07
+* K8s.GCR.IO/SIG-스토리지/CSI-공급자:v3.2.1
+* K8s.GCR.IO/SIG-storage/CSI-attacher:v3.5.0
+* k8s.gcr.io/sig-storage/scsi-resizer: v1.5.0
+* K8s.GCR.IO/SIG-storage/CSI-snapshotter:v6.0.1
+* K8s.GCR.IO/SIG-storage/CSI-node-driver-registrar: v2.5.1
+* NetApp/트리덴트 - 운영자: 22.07.0(선택 사항)
+
+
+
+
+| v1.24.0  a| 
+* NetApp/트리덴트: 22.07.0
+* NetApp/트리덴트 - 자동 지원: 22.07
+* K8s.GCR.IO/SIG-스토리지/CSI-공급자:v3.2.1
+* K8s.GCR.IO/SIG-storage/CSI-attacher:v3.5.0
+* k8s.gcr.io/sig-storage/scsi-resizer: v1.5.0
+* K8s.GCR.IO/SIG-storage/CSI-snapshotter:v6.0.1
+* K8s.GCR.IO/SIG-storage/CSI-node-driver-registrar: v2.5.1
+* NetApp/트리덴트 - 운영자: 22.07.0(선택 사항)
+
+
+|===
+
+NOTE: Kubernetes 버전 1.20 이상에서 검증된 를 사용합니다 `registry.k8s.gcr.io/sig-storage/csi-snapshotter:v6.x` ?곸긽?? `v1` 에서 지원하는 버전입니다 `volumesnapshots.snapshot.storage.k8s.gcr.io` CRD 를 누릅니다 `v1beta1` 에서 CRD를 지원하는 버전입니다 `v1` 버전, 검증된 을 사용합니다 `registry.k8s.gcr.io/sig-storage/csi-snapshotter:v3.x` 이미지.

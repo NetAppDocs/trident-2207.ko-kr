@@ -1,0 +1,161 @@
+---
+sidebar: sidebar 
+permalink: trident-use/worker-node-prep.html 
+keywords: storage class, manage storage class, storage classes, kubernetes storage classes, worker node, nfs, iscsi, kubernetes clusters 
+summary: Kubernetes 클러스터의 모든 작업자 노드는 Pod용으로 프로비저닝된 볼륨을 마운트할 수 있어야 합니다. 백엔드 중 하나에 ONTAP-NAS, ONTAP-NAS-이코노미, ONTAP-NAS-Flexgroup 드라이버를 사용하는 경우 작업자 노드에 NFS 툴이 필요합니다. 그렇지 않으면 iSCSI 도구가 필요합니다. 
+---
+= 작업자 노드를 준비합니다
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+Kubernetes 클러스터의 모든 작업자 노드는 Pod용으로 프로비저닝된 볼륨을 마운트할 수 있어야 합니다. 를 사용하는 경우 `ontap-nas`, `ontap-nas-economy`, 또는 `ontap-nas-flexgroup` 드라이버 백 엔드 중 하나에 대해 작업자 노드에는 NFS 도구가 필요합니다. 그렇지 않으면 iSCSI 도구가 필요합니다.
+
+최신 버전의 RedHat CoreOS에는 기본적으로 NFS와 iSCSI가 모두 설치되어 있습니다.
+
+
+WARNING: NFS 또는 iSCSI 툴을 설치한 후에는 항상 작업자 노드를 재부팅해야 하며, 그렇지 않으면 컨테이너에 볼륨을 연결할 수 없습니다.
+
+
+
+== 노드 서비스 검색
+
+22.07부터 Astra Trident는 노드가 iSCSI 또는 NFS 서비스를 실행할 수 있는지 자동으로 감지하려고 시도합니다. Astra Trident는 검색된 서비스를 식별하기 위해 노드에 대한 이벤트를 생성합니다. 다음 명령을 사용하여 이러한 이벤트를 검토할 수 있습니다.
+
+[listing]
+----
+kubectl get event -A --field-selector involvedObject.name=<Kubernetes node name>
+----
+또한 Trident는 Trident 노드 CR의 각 노드에 대해 활성화된 서비스도 식별합니다. 검색된 서비스를 보려면 다음 명령을 사용합니다.
+
+[listing]
+----
+tridentctl get node -o wide -n <Trident namespace>
+----
+
+NOTE: 노드 서비스 검색은 검색된 서비스를 식별하지만 서비스가 올바르게 구성된다고 보장하지 않습니다. 반대로 검색된 서비스가 없으면 볼륨 마운트가 실패한다고 보장할 수 없습니다.
+
+
+
+== NFS 볼륨
+
+[cols="3*"]
+|===
+| 프로토콜 | 운영 체제 | 명령 
+
+
+| NFS 를 참조하십시오  a| 
+RHEL/CentOS 7
+ a| 
+`sudo yum install -y nfs-utils`
+
+
+
+| NFS 를 참조하십시오  a| 
+우분투
+ a| 
+`sudo apt-get install -y nfs-common`
+
+|===
+
+NOTE: 부팅 중에 NFS 서비스가 시작되었는지 확인해야 합니다.
+
+
+
+== iSCSI 볼륨
+
+iSCSI 볼륨을 사용할 때는 다음 사항을 고려하십시오.
+
+* Kubernetes 클러스터의 각 노드에는 고유한 IQN이 있어야 합니다. * 이것은 필수 전제 조건입니다 *.
+* RHCOS 버전 4.5 이상 또는 기타 RHEL 호환 Linux 배포를 사용하는 경우 를 참조하십시오 `solidfire-san` 드라이버 에서 CHAP 인증 알고리즘이 md5로 설정되어 있는지 확인합니다 `/etc/iscsi/iscsid.conf`.
++
+[listing]
+----
+sudo sed -i 's/^\(node.session.auth.chap_algs\).*/\1 = MD5/' /etc/iscsi/iscsid.conf
+----
+* iSCSI PVS에서 RHEL/RedHat CoreOS를 실행하는 작업자 노드를 사용하는 경우 를 지정해야 합니다 `discard` StorageClass의 mountOption을 사용하여 인라인 공간 재확보를 수행합니다. 을 참조하십시오 https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/managing_file_systems/discarding-unused-blocks_managing-file-systems["RedHat 설명서"^].
+
+
+[cols="3*"]
+|===
+| 프로토콜 | 운영 체제 | 명령 
+
+
+| iSCSI  a| 
+RHEL/CentOS
+ a| 
+. 다음 시스템 패키지를 설치합니다.
++
+`sudo yum install -y lsscsi iscsi-initiator-utils sg3_utils device-mapper-multipath`
+
+. iscsi-initiator-utils 버전이 6.2.0.874-2.el7 이상인지 확인합니다.
++
+`rpm -q iscsi-initiator-utils`
+
+. 스캔을 수동으로 설정합니다.
++
+`sudo sed -i 's/^\(node.session.scan\).*/\1 = manual/' /etc/iscsi/iscsid.conf`
+
+. 다중 경로 설정:
++
+`sudo mpathconf --enable --with_multipathd y --find_multipaths n`
+
++
+
+NOTE: 확인합니다 `etc/multipath.conf` 포함 `find_multipaths no` 에서 `defaults`.
+
+. 확인하십시오 `iscsid` 및 `multipathd` 실행 중:
++
+`sudo systemctl enable --now iscsid multipathd`
+
+. 활성화 및 시작 `iscsi`:
++
+`sudo systemctl enable --now iscsi`
+
+
+
+
+
+| iSCSI  a| 
+우분투
+ a| 
+. 다음 시스템 패키지를 설치합니다.
++
+`sudo apt-get install -y open-iscsi lsscsi sg3-utils multipath-tools scsitools`
+
+. open-iscsi 버전이 2.0.874-5ubuntu2.10 이상(bionic) 또는 2.0.874-7.1uubuttu6.1 이상(focal)인지 확인합니다.
++
+`dpkg -l open-iscsi`
+
+. 스캔을 수동으로 설정합니다.
++
+`sudo sed -i 's/^\(node.session.scan\).*/\1 = manual/' /etc/iscsi/iscsid.conf`
+
+. 다중 경로 설정:
++
+`sudo tee /etc/multipath.conf <<-'EOF'
+defaults {
+    user_friendly_names yes
+    find_multipaths no
+}
+EOF
+sudo systemctl enable --now multipath-tools.service
+sudo service multipath-tools restart`
+
++
+
+NOTE: 확인합니다 `etc/multipath.conf` 포함 `find_multipaths no` 에서 `defaults`.
+
+. 확인하십시오 `open-iscsi` 및 `multipath-tools` 활성화 및 실행:
++
+`sudo systemctl status multipath-tools`
+`sudo systemctl enable --now open-iscsi.service`
+`sudo systemctl status open-iscsi`
+
+
+
+|===
+
+NOTE: Ubuntu 18.04의 경우 을 사용하여 대상 포트를 검색해야 합니다 `iscsiadm` 시작 전 `open-iscsi` iSCSI 데몬을 시작합니다. 또는 을 수정할 수 있습니다 `iscsi` 시작할 서비스 `iscsid` 자동으로.

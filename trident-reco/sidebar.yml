@@ -1,0 +1,14 @@
+---
+section: trident-reco
+title: 모범 사례 및 권장사항
+entries:
+- title: 구축
+  url: "/trident-reco/deploy-reco.html"
+- title: 스토리지 구성
+  url: "/trident-reco/storage-config-best-practices.html"
+- title: Astra Trident 통합
+  url: "/trident-reco/integrate-trident.html"
+- title: 데이터 보호
+  url: "/trident-reco/backup.html"
+- title: 보안
+  url: "/trident-reco/security-reco.html"

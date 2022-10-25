@@ -1,0 +1,264 @@
+---
+sidebar: sidebar 
+permalink: trident-use/element.html 
+keywords: trident backend, solidfire, netapp hci 
+summary: Astra Trident 설치와 함께 Element 백엔드를 생성하고 사용하는 방법에 대해 알아보십시오. 
+---
+= NetApp HCI 또는 SolidFire 백엔드를 구성합니다
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+Astra Trident 설치와 함께 Element 백엔드를 생성하고 사용하는 방법에 대해 알아보십시오.
+
+.무엇을 &#8217;필요로 할거야
+* Element 소프트웨어를 실행하는 지원되는 스토리지 시스템
+* 볼륨을 관리할 수 있는 NetApp HCI/SolidFire 클러스터 관리자 또는 테넌트 사용자에 대한 자격 증명
+* 모든 Kubernetes 작업자 노드에 적절한 iSCSI 툴이 설치되어 있어야 합니다. 을 참조하십시오 link:../trident-use/worker-node-prep.html["작업자 노드 준비 정보"^].
+
+
+를 클릭합니다 `solidfire-san` 스토리지 드라이버는 파일 및 블록의 볼륨 모드를 모두 지원합니다. 의 경우 `Filesystem` 볼륨 코드, Astra Trident가 볼륨을 생성하고 파일 시스템을 생성합니다. 파일 시스템 유형은 StorageClass에 의해 지정됩니다.
+
+[cols="5"]
+|===
+| 드라이버 | 프로토콜 | 볼륨 모드 | 액세스 모드가 지원됩니다 | 지원되는 파일 시스템 
+
+
+| `solidfire-san`  a| 
+iSCSI
+ a| 
+블록
+ a| 
+RWO, ROX, rwx
+ a| 
+파일 시스템이 없습니다. 원시 블록 장치.
+
+
+
+| `solidfire-san`  a| 
+iSCSI
+ a| 
+블록
+ a| 
+RWO, ROX, rwx
+ a| 
+파일 시스템이 없습니다. 원시 블록 장치.
+
+
+
+| `solidfire-san`  a| 
+iSCSI
+ a| 
+파일 시스템
+ a| 
+RWO, ROX
+ a| 
+`xfs`, `ext3`, `ext4`
+
+
+
+| `solidfire-san`  a| 
+iSCSI
+ a| 
+파일 시스템
+ a| 
+RWO, ROX
+ a| 
+`xfs`, `ext3`, `ext4`
+
+|===
+
+NOTE: Astra Trident는 향상된 CSI Provisioner로 작동할 때 CHAP를 사용합니다. CHAP(CSI의 기본값)를 사용하는 경우 추가 준비가 필요하지 않습니다. 를 명시적으로 설정하는 것이 좋습니다 `UseCHAP` 비 CSI Trident와 CHAP를 사용하는 옵션입니다. 그렇지 않으면 를 참조하십시오 link:../trident-concepts/vol-access-groups.html["여기"^].
+
+
+WARNING: 볼륨 액세스 그룹은 Astra Trident의 기존 비 CSI 프레임워크에서만 지원됩니다. CSI 모드에서 작동하도록 구성된 경우 Astra Trident는 CHAP를 사용합니다.
+
+둘 다 해당되지 않는 경우 `AccessGroups` 또는 `UseCHAP` 설정된 경우 다음 규칙 중 하나가 적용됩니다.
+
+* 기본값 `trident` 액세스 그룹이 감지되고 액세스 그룹이 사용됩니다.
+* 액세스 그룹이 감지되지 않고 Kubernetes 버전이 1.7 이상인 경우 CHAP가 사용됩니다.
+
+
+
+
+== 백엔드 구성 옵션
+
+백엔드 구성 옵션은 다음 표를 참조하십시오.
+
+[cols="3"]
+|===
+| 매개 변수 | 설명 | 기본값 
+
+
+| `version` |  | 항상 1 
+
+
+| `storageDriverName` | 스토리지 드라이버의 이름입니다 | 항상 "solidfire-san" 
+
+
+| `backendName` | 사용자 지정 이름 또는 스토리지 백엔드 | “SolidFire_” + 스토리지(iSCSI) IP 주소입니다 
+
+
+| `Endpoint` | 테넌트 자격 증명이 있는 SolidFire 클러스터의 MVIP입니다 |  
+
+
+| `SVIP` | 스토리지(iSCSI) IP 주소 및 포트 |  
+
+
+| `labels` | 볼륨에 적용할 임의의 JSON 형식 레이블 세트입니다. | “” 
+
+
+| `TenantName` | 사용할 테넌트 이름(찾을 수 없는 경우 생성됨) |  
+
+
+| `InitiatorIFace` | iSCSI 트래픽을 특정 호스트 인터페이스로 제한합니다 | “기본값” 
+
+
+| `UseCHAP` | CHAP를 사용하여 iSCSI를 인증합니다 | 참 
+
+
+| `AccessGroups` | 사용할 액세스 그룹 ID 목록입니다 | "트리덴트"라는 액세스 그룹의 ID를 찾습니다. 
+
+
+| `Types` | QoS 사양 |  
+
+
+| `limitVolumeSize` | 요청된 볼륨 크기가 이 값보다 큰 경우 용량 할당에 실패합니다 | “”(기본적으로 적용되지 않음) 
+
+
+| `debugTraceFlags` | 문제 해결 시 사용할 디버그 플래그입니다. 예: {“api”:false, “method”:true} | null입니다 
+|===
+
+WARNING: 사용하지 마십시오 `debugTraceFlags` 문제 해결 및 자세한 로그 덤프가 필요한 경우를 제외하고
+
+
+NOTE: 생성된 모든 볼륨에 대해 Astra Trident는 스토리지 풀에 있는 모든 레이블을 프로비저닝할 때 해당 스토리지 LUN에 복사합니다. 스토리지 관리자는 스토리지 풀별로 레이블을 정의하고 스토리지 풀에서 생성된 모든 볼륨을 그룹화할 수 있습니다. 이를 통해 백엔드 구성에서 제공되는 사용자 지정 가능한 레이블 세트를 기반으로 볼륨을 쉽게 구별할 수 있습니다.
+
+
+
+== 예 1: 세 가지 볼륨 유형을 사용하는 solidfire-SAN 드라이버에 대한 백엔드 구성
+
+이 예에서는 CHAP 인증을 사용하는 백엔드 파일을 보여 주고 특정 QoS 보장을 포함하는 세 가지 볼륨 유형을 모델링합니다. 그런 다음 에서 각 스토리지 클래스를 사용할 스토리지 클래스를 정의할 가능성이 높습니다 `IOPS` 스토리지 클래스 매개 변수입니다.
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "solidfire-san",
+    "Endpoint": "https://<user>:<password>@<mvip>/json-rpc/8.0",
+    "SVIP": "<svip>:3260",
+    "TenantName": "<tenant>",
+    "labels": {"k8scluster": "dev1", "backend": "dev1-element-cluster"},
+    "UseCHAP": true,
+    "Types": [{"Type": "Bronze", "Qos": {"minIOPS": 1000, "maxIOPS": 2000, "burstIOPS": 4000}},
+              {"Type": "Silver", "Qos": {"minIOPS": 4000, "maxIOPS": 6000, "burstIOPS": 8000}},
+              {"Type": "Gold", "Qos": {"minIOPS": 6000, "maxIOPS": 8000, "burstIOPS": 10000}}]
+}
+----
+
+
+== 예 2: 가상 스토리지 풀이 있는 solidfire-SAN 드라이버에 대한 백엔드 및 스토리지 클래스 구성
+
+이 예에서는 가상 스토리지 풀과 이를 다시 참조하는 StorageClasses와 함께 구성된 백엔드 정의 파일을 보여 줍니다.
+
+아래 표시된 샘플 백엔드 정의 파일에서 특정 기본값은 를 설정하는 모든 스토리지 풀에 대해 설정됩니다 `type` 실버. 가상 스토리지 풀은 에 정의되어 있습니다 `storage` 섹션을 참조하십시오. 이 예에서는 일부 스토리지 풀이 자체 유형을 설정하고 일부 풀은 위에 설정된 기본값을 덮어씁니다.
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "solidfire-san",
+    "Endpoint": "https://<user>:<password>@<mvip>/json-rpc/8.0",
+    "SVIP": "<svip>:3260",
+    "TenantName": "<tenant>",
+    "UseCHAP": true,
+    "Types": [{"Type": "Bronze", "Qos": {"minIOPS": 1000, "maxIOPS": 2000, "burstIOPS": 4000}},
+              {"Type": "Silver", "Qos": {"minIOPS": 4000, "maxIOPS": 6000, "burstIOPS": 8000}},
+              {"Type": "Gold", "Qos": {"minIOPS": 6000, "maxIOPS": 8000, "burstIOPS": 10000}}],
+
+    "type": "Silver",
+    "labels":{"store":"solidfire", "k8scluster": "dev-1-cluster"},
+    "region": "us-east-1",
+
+    "storage": [
+        {
+            "labels":{"performance":"gold", "cost":"4"},
+            "zone":"us-east-1a",
+            "type":"Gold"
+        },
+        {
+            "labels":{"performance":"silver", "cost":"3"},
+            "zone":"us-east-1b",
+            "type":"Silver"
+        },
+        {
+            "labels":{"performance":"bronze", "cost":"2"},
+            "zone":"us-east-1c",
+            "type":"Bronze"
+        },
+        {
+            "labels":{"performance":"silver", "cost":"1"},
+            "zone":"us-east-1d"
+        }
+    ]
+}
+----
+다음 StorageClass 정의는 위의 가상 스토리지 풀을 참조합니다. 를 사용합니다 `parameters.selector` 필드에서 각 StorageClass는 볼륨을 호스팅하는 데 사용할 수 있는 가상 풀을 호출합니다. 선택한 가상 풀에 볼륨이 정의되어 있습니다.
+
+첫 번째 StorageClass입니다 (`solidfire-gold-four`)는 첫 번째 가상 스토리지 풀에 매핑합니다. 이 수영장은 골드 성능을 제공하는 유일한 수영장입니다 `Volume Type QoS` 않습니다. 마지막 StorageClass입니다 (`solidfire-silver`) 은 뛰어난 성능을 제공하는 스토리지 풀을 호출합니다. Astra Trident가 선택한 가상 스토리지 풀을 결정하고 스토리지 요구 사항을 충족해 줍니다.
+
+[listing]
+----
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: solidfire-gold-four
+provisioner: csi.trident.netapp.io
+parameters:
+  selector: "performance=gold; cost=4"
+  fsType: "ext4"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: solidfire-silver-three
+provisioner: csi.trident.netapp.io
+parameters:
+  selector: "performance=silver; cost=3"
+  fsType: "ext4"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: solidfire-bronze-two
+provisioner: csi.trident.netapp.io
+parameters:
+  selector: "performance=bronze; cost=2"
+  fsType: "ext4"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: solidfire-silver-one
+provisioner: csi.trident.netapp.io
+parameters:
+  selector: "performance=silver; cost=1"
+  fsType: "ext4"
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: solidfire-silver
+provisioner: csi.trident.netapp.io
+parameters:
+  selector: "performance=silver"
+  fsType: "ext4"
+----
+
+
+== 자세한 내용을 확인하십시오
+
+* link:../trident-concepts/vol-access-groups.html["볼륨 액세스 그룹"^]
+

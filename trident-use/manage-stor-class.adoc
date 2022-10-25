@@ -1,0 +1,118 @@
+---
+sidebar: sidebar 
+permalink: trident-use/manage-stor-class.html 
+keywords: storage class, manage storage class, storage classes, kubernetes storage classes 
+summary: 스토리지 클래스를 생성하고, 스토리지 클래스를 삭제하고, 기존 스토리지 클래스를 볼 수 있습니다. 
+---
+= 스토리지 클래스를 관리합니다
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+스토리지 클래스 생성, 스토리지 클래스 삭제 및 기존 스토리지 클래스 보기에 대한 정보를 찾을 수 있습니다.
+
+
+
+== 스토리지 클래스를 설계합니다
+
+을 참조하십시오 link:../trident-reference/objects.html["여기"^] 스토리지 클래스의 정의 및 구성 방법에 대한 자세한 내용은 를 참조하십시오.
+
+
+
+== 스토리지 클래스를 생성합니다
+
+스토리지 클래스 파일이 있으면 다음 명령을 실행합니다.
+
+[listing]
+----
+kubectl create -f <storage-class-file>
+----
+`<storage-class-file>` 스토리지 클래스 파일 이름으로 바꿔야 합니다.
+
+
+
+== 스토리지 클래스를 삭제합니다
+
+Kubernetes에서 스토리지 클래스를 삭제하려면 다음 명령을 실행합니다.
+
+[listing]
+----
+kubectl delete storageclass <storage-class>
+----
+`<storage-class>` 스토리지 클래스로 교체해야 합니다.
+
+이 스토리지 클래스를 통해 생성된 영구 볼륨은 변경되지 않으며 Astra Trident는 계속 관리합니다.
+
+
+NOTE: Astra Trident가 공백을 적용합니다 `fsType` 볼륨에 대해 생성할 수 있습니다. iSCSI 백엔드의 경우 적용하는 것이 좋습니다 `parameters.fsType` StorageClass에 있습니다. esixing StorageClasses를 삭제하고 를 사용하여 다시 생성해야 합니다 `parameters.fsType` 지정됨.
+
+
+
+== 기존 스토리지 클래스를 봅니다
+
+* 기존 Kubernetes 스토리지 클래스를 보려면 다음 명령을 실행합니다.
+
+
+[listing]
+----
+kubectl get storageclass
+----
+* Kubernetes 스토리지 클래스 세부 정보를 보려면 다음 명령을 실행합니다.
+
+
+[listing]
+----
+kubectl get storageclass <storage-class> -o json
+----
+* Astra Trident의 동기화된 스토리지 클래스를 보려면 다음 명령을 실행합니다.
+
+
+[listing]
+----
+tridentctl get storageclass
+----
+* Astra Trident의 동기화된 스토리지 클래스 세부 정보를 보려면 다음 명령을 실행합니다.
+
+
+[listing]
+----
+tridentctl get storageclass <storage-class> -o json
+----
+
+
+== 기본 스토리지 클래스를 설정합니다
+
+Kubernetes 1.6에는 기본 스토리지 클래스를 설정하는 기능이 추가되었습니다. 사용자가 영구 볼륨 클레임(PVC)에 영구 볼륨을 지정하지 않는 경우 영구 볼륨을 프로비저닝하는 데 사용되는 스토리지 클래스입니다.
+
+* 주석을 설정하여 기본 스토리지 클래스를 정의합니다 `storageclass.kubernetes.io/is-default-class` 스토리지 클래스 정의에서 true로 설정합니다. 사양에 따라 다른 값이나 주석 부재는 FALSE로 해석됩니다.
+* 다음 명령을 사용하여 기존 스토리지 클래스를 기본 스토리지 클래스로 구성할 수 있습니다.
+
+
+[listing]
+----
+kubectl patch storageclass <storage-class-name> -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+----
+* 마찬가지로 다음 명령을 사용하여 기본 스토리지 클래스 주석을 제거할 수 있습니다.
+
+
+[listing]
+----
+kubectl patch storageclass <storage-class-name> -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+----
+또한 Trident 설치 프로그램 번들에는 이 주석을 포함하는 예제도 있습니다.
+
+
+NOTE: 언제든지 클러스터에는 기본 스토리지 클래스가 하나만 있어야 합니다. Kubernetes에서 둘 이상의 작업을 수행하는 것을 기술적으로 금지하지는 않지만 기본 스토리지 클래스가 없는 것처럼 동작합니다.
+
+
+
+== 스토리지 클래스에 대한 백엔드를 식별합니다
+
+JSON으로 답할 수 있는 질문의 예입니다 `tridentctl` Astra Trident 백엔드 객체의 출력입니다. 이 옵션은 를 사용합니다 `jq` 먼저 설치해야 할 수도 있는 유틸리티입니다.
+
+[listing]
+----
+tridentctl get storageclass -o json | jq  '[.items[] | {storageClass: .Config.name, backends: [.storage]|unique}]'
+----

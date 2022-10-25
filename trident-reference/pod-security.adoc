@@ -1,0 +1,218 @@
+---
+sidebar: sidebar 
+permalink: trident-reference/pod-security.html 
+keywords: psp, pss, scc, pod security, pod security standards, pod security policies, security context contraints 
+summary: 'Kubernetes Pod 보안 표준(PSS) 및 Pod 보안 정책(PSP)에서 사용 권한 수준을 정의하고 Pod의 동작을 제한합니다. OpenShift Security Context Constraints(SCC)도 OpenShift Kubernetes Engine에 특정한 POD 제한을 정의합니다. 이러한 사용자 지정을 제공하기 위해 Astra Trident는 설치 중에 특정 권한을 활성화합니다.' 
+---
+= POD 보안 표준(PSS) 및 보안 컨텍스트 제약(SCC)
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+Kubernetes Pod 보안 표준(PSS) 및 Pod 보안 정책(PSP)에서 사용 권한 수준을 정의하고 Pod의 동작을 제한합니다. OpenShift Security Context Constraints(SCC)도 OpenShift Kubernetes Engine에 특정한 POD 제한을 정의합니다. 이러한 사용자 지정을 제공하기 위해 Astra Trident는 설치 중에 특정 권한을 활성화합니다. 다음 섹션에서는 Astra Trident에서 설정한 사용 권한에 대해 자세히 설명합니다.
+
+
+NOTE: PSS는 Pod 보안 정책(PSP)을 대체합니다. PSP는 Kubernetes v1.21에서 사용되지 않으며 v1.25에서 제거됩니다. 자세한 내용은 을 참조하십시오 link:https://kubernetes.io/docs/concepts/security/["Kubernetes: 보안"].
+
+
+
+== 필요한 Kubernetes 보안 컨텍스트 및 관련 필드
+
+[cols=","]
+|===
+| 권한 | 설명 
+
+
+| 특별 권한 | CSI를 사용하려면 마운트 지점이 양방향이어야 합니다. 즉, Trident 노드 포드가 권한이 있는 컨테이너를 실행해야 합니다. 자세한 내용은 을 참조하십시오 link:https://kubernetes.io/docs/concepts/storage/volumes/#mount-propagation["Kubernetes: 마운트 전파"]. 
+
+
+| 호스트 네트워킹 | iSCSI 데몬에 필요합니다. `iscsiadm` iSCSI 마운트를 관리하고 호스트 네트워킹을 사용하여 iSCSI 데몬과 통신합니다. 
+
+
+| 호스트 IPC | NFS는 IPC(프로세스 간 통신)를 사용하여 NFSD와 통신합니다. 
+
+
+| 호스트 PID | 를 시작해야 합니다 `rpc-statd` 대해 NFS를 선택합니다. Astra Trident가 호스트 프로세스를 쿼리하여 확인 여부를 결정합니다 `rpc-statd` NFS 볼륨을 마운트하기 전에 실행 중입니다. 
+
+
+| 제공합니다 | 를 클릭합니다 `SYS_ADMIN` 권한이 있는 컨테이너에 대한 기본 기능의 일부로 기능이 제공됩니다. 예를 들어, Docker는 권한이 있는 컨테이너에 대해 다음 기능을 설정합니다.
+`CapPrm: 0000003fffffffff`
+`CapEff: 0000003fffffffff` 
+
+
+| Seccomp | Seccomp 프로필은 권한 있는 컨테이너에서 항상 "제한 없음"이므로 Astra Trident에서 활성화할 수 없습니다. 
+
+
+| SELinux | OpenShift에서는 권한이 있는 컨테이너가 에서 실행됩니다 `spc_t` ("슈퍼 프리권한 컨테이너") 도메인 및 권한 없는 컨테이너는 에서 실행됩니다 `container_t` 도메인. 켜짐 `containerd`, 및 `container-selinux` 설치된 모든 컨테이너는 에서 실행됩니다 `spc_t` SELinux를 효과적으로 비활성화하는 도메인입니다. 따라서 Astra Trident는 추가되지 않습니다 `seLinuxOptions` 컨테이너로. 
+
+
+| DAC | 권한이 있는 컨테이너는 루트로 실행되어야 합니다. 권한이 없는 컨테이너는 root로 실행되어 CSI에 필요한 UNIX 소켓에 액세스합니다. 
+|===
+
+
+== POD 보안 표준(PSS)
+
+[cols=",,"]
+|===
+| 라벨 | 설명 | 기본값 
+
+
+| `pod-security.kubernetes.io/enforce`
+
+ `pod-security.kubernetes.io/enforce-version` | Trident 컨트롤러와 노드를 설치 네임스페이스에 받아들일 수 있습니다. 네임스페이스 레이블을 변경하지 마십시오. | `enforce: privileged`
+
+`enforce-version: <version of the current cluster or highest version of PSS tested.>` 
+|===
+
+WARNING: 네임스페이스 레이블을 변경하면 포드가 예약되지 않고 "오류 생성:..." 또는 "경고: 트리덴트 - CSI -..."가 발생할 수 있습니다. 이 경우 에 대한 네임스페이스 레이블이 있는지 확인합니다 `privileged` 변경되었습니다. 있는 경우 Trident를 다시 설치합니다.
+
+
+
+== PSP(POD 보안 정책)
+
+[cols=",,"]
+|===
+| 필드에 입력합니다 | 설명 | 기본값 
+
+
+| `allowPrivilegeEscalation` | 권한 있는 컨테이너는 권한 에스컬레이션을 허용해야 합니다. | `true` 
+
+
+| `allowedCSIDrivers` | Trident는 인라인 CSI 임시 볼륨을 사용하지 않습니다. | 비어 있습니다 
+
+
+| `allowedCapabilities` | 권한이 없는 Trident 컨테이너는 기본 세트보다 더 많은 기능을 필요로 하지 않으며 권한이 있는 컨테이너에 모든 가능한 기능이 부여됩니다. | 비어 있습니다 
+
+
+| `allowedFlexVolumes` | Trident는 을 사용하지 않습니다 link:https://github.com/kubernetes/community/blob/master/contributors/devel/sig-storage/flexvolume.md["FlexVolume 드라이버"^]따라서 허용된 볼륨 목록에 포함되지 않습니다. | 비어 있습니다 
+
+
+| `allowedHostPaths` | Trident 노드 포드는 노드의 루트 파일 시스템을 마운트하므로 이 목록을 설정하는 데는 아무런 이점이 없습니다. | 비어 있습니다 
+
+
+| `allowedProcMountTypes` | Trident는 아무 용하지 않습니다 `ProcMountTypes`. | 비어 있습니다 
+
+
+| `allowedUnsageSysctls` | Trident는 안전하지 않을 필요가 없습니다 `sysctls`. | 비어 있습니다 
+
+
+| `defaultAddCapabilities` | 권한이 있는 컨테이너에 기능을 추가할 필요가 없습니다. | 비어 있습니다 
+
+
+| `defaultAllowPrivilegeEscalation` | 권한 에스컬레이션을 허용하는 작업은 각 Trident 포드에서 처리됩니다. | `false` 
+
+
+| `forbiddenSysctls` | 아니요 `sysctls` 허용됩니다. | 비어 있습니다 
+
+
+| `fsGroup` | Trident 컨테이너가 루트로 실행됩니다. | `RunAsAny` 
+
+
+| `hostIPC` | NFS 볼륨을 마운트하려면 호스트 IPC가 와 통신해야 합니다 `nfsd` | `true` 
+
+
+| `hostNetwork` | iscsiadm을 사용하려면 호스트 네트워크가 iSCSI 데몬과 통신해야 합니다. | `true` 
+
+
+| `hostPID` | 호스트 PID가 있는지 확인해야 합니다 `rpc-statd` 노드에서 실행 중입니다. | `true` 
+
+
+| `hostPorts` | Trident는 호스트 포트를 사용하지 않습니다. | 비어 있습니다 
+
+
+| `privileged` | Trident 노드 포드는 볼륨을 마운트하려면 권한이 있는 컨테이너를 실행해야 합니다. | `true` 
+
+
+| `readOnlyRootFilesystem` | Trident 노드 포드는 노드 파일 시스템에 써야 합니다. | `false` 
+
+
+| `requiredDropCapabilities` | Trident 노드 포드는 권한이 있는 컨테이너를 실행하고 기능을 삭제할 수 없습니다. | `none` 
+
+
+| `runAsGroup` | Trident 컨테이너가 루트로 실행됩니다. | `RunAsAny` 
+
+
+| `runAsUser` | Trident 컨테이너가 루트로 실행됩니다. | `runAsAny` 
+
+
+| `runtimeClass` | Trident가 사용되지 않습니다 `RuntimeClasses`. | 비어 있습니다 
+
+
+| `seLinux` | Trident가 설정되지 않았습니다 `seLinuxOptions` 현재 컨테이너 실행 시간과 Kubernetes 배포에서 SELinux를 처리하는 방법은 서로 다릅니다. | 비어 있습니다 
+
+
+| `supplementalGroups` | Trident 컨테이너가 루트로 실행됩니다. | `RunAsAny` 
+
+
+| `volumes` | Trident Pod에는 이러한 볼륨 플러그인이 필요합니다. | `hostPath, projected, emptyDir` 
+|===
+
+
+== SCC(Security Context Constraints)
+
+[cols=",,"]
+|===
+| 라벨 | 설명 | 기본값 
+
+
+| `allowHostDirVolumePlugin` | Trident 노드 포드는 노드의 루트 파일 시스템을 마운트합니다. | `true` 
+
+
+| `allowHostIPC` | NFS 볼륨을 마운트하려면 호스트 IPC가 와 통신해야 합니다 `nfsd`. | `true` 
+
+
+| `allowHostNetwork` | iscsiadm을 사용하려면 호스트 네트워크가 iSCSI 데몬과 통신해야 합니다. | `true` 
+
+
+| `allowHostPID` | 호스트 PID가 있는지 확인해야 합니다 `rpc-statd` 노드에서 실행 중입니다. | `true` 
+
+
+| `allowHostPorts` | Trident는 호스트 포트를 사용하지 않습니다. | `false` 
+
+
+| `allowPrivilegeEscalation` | 권한 있는 컨테이너는 권한 에스컬레이션을 허용해야 합니다. | `true` 
+
+
+| `allowPrivilegedContainer` | Trident 노드 포드는 볼륨을 마운트하려면 권한이 있는 컨테이너를 실행해야 합니다. | `true` 
+
+
+| `allowedUnsafeSysctls` | Trident는 안전하지 않을 필요가 없습니다 `sysctls`. | `none` 
+
+
+| `allowedCapabilities` | 권한이 없는 Trident 컨테이너는 기본 세트보다 더 많은 기능을 필요로 하지 않으며 권한이 있는 컨테이너에 모든 가능한 기능이 부여됩니다. | 비어 있습니다 
+
+
+| `defaultAddCapabilities` | 권한이 있는 컨테이너에 기능을 추가할 필요가 없습니다. | 비어 있습니다 
+
+
+| `fsGroup` | Trident 컨테이너가 루트로 실행됩니다. | `RunAsAny` 
+
+
+| `groups` | 이 SCC는 Trident에만 해당되며 사용자에게 바인딩됩니다. | 비어 있습니다 
+
+
+| `readOnlyRootFilesystem` | Trident 노드 포드는 노드 파일 시스템에 써야 합니다. | `false` 
+
+
+| `requiredDropCapabilities` | Trident 노드 포드는 권한이 있는 컨테이너를 실행하고 기능을 삭제할 수 없습니다. | `none` 
+
+
+| `runAsUser` | Trident 컨테이너가 루트로 실행됩니다. | `RunAsAny` 
+
+
+| `seLinuxContext` | Trident가 설정되지 않았습니다 `seLinuxOptions` 현재 컨테이너 실행 시간과 Kubernetes 배포에서 SELinux를 처리하는 방법은 서로 다릅니다. | 비어 있습니다 
+
+
+| `seccompProfiles` | 특권 컨테이너는 항상 "비제한" 상태로 실행됩니다. | 비어 있습니다 
+
+
+| `supplementalGroups` | Trident 컨테이너가 루트로 실행됩니다. | `RunAsAny` 
+
+
+| `users` | 이 SCC를 Trident 네임스페이스의 Trident 사용자에게 바인딩하기 위해 하나의 항목이 제공됩니다. | 해당 없음 
+
+
+| `volumes` | Trident Pod에는 이러한 볼륨 플러그인이 필요합니다. | `hostPath, downwardAPI, projected, emptyDir` 
+|===

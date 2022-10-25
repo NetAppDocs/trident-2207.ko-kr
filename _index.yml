@@ -1,0 +1,61 @@
+---
+indexpage:
+  lead: Astra Trident는 NetApp에서 관리하는 오픈 소스 스토리지 공급자 및 오케스트레이터입니다. Docker 및 Kubernetes에서
+    관리하는 컨테이너식 애플리케이션을 위한 스토리지 볼륨을 생성할 수 있습니다.
+  tiles:
+  - title: 시작하십시오
+    links:
+    - title: Astra Trident에 대해 자세히 알아보십시오
+      url: "/trident-concepts/intro.html"
+    - title: 릴리스 정보
+      url: trident-rn.html
+    - title: 요구 사항
+      url: "/trident-get-started/requirements.html"
+    - title: 시도해 보십시오
+      url: "/trident-get-started/quickstart.html"
+    - title: FAQ 를 참조하십시오
+      url: "/faq.html"
+  - title: Astra Trident 구축
+    links:
+    - title: Trident 연산자를 사용하여 배포합니다
+      url: "/trident-get-started/kubernetes-deploy-operator.html"
+    - title: tridentctl을 사용하여 배포합니다
+      url: "/trident-get-started/kubernetes-deploy-tridentctl.html"
+    - title: Docker를 위한 Astra Trident 구축
+      url: "/trident-docker/deploy-docker.html"
+  - title: Astra Trident를 업그레이드합니다
+    links:
+    - title: Trident 연산자를 사용하여 업그레이드합니다
+      url: "/trident-managing-k8s/upgrade-operator.html"
+    - title: tridentctl로 업그레이드하십시오
+      url: "/trident-managing-k8s/upgrade-tridentctl.html"
+  - title: Astra Trident를 사용해 보십시오
+    links:
+    - title: 백엔드 구성
+      url: "/trident-use/backends.html"
+    - title: kubectl로 백엔드를 만듭니다
+      url: "/trident-use/backend-kubectl.html"
+    - title: 백엔드 관리 옵션 간 이동
+      url: "/trident-use/backend_options.html"
+    - title: 스토리지 클래스를 관리합니다
+      url: "/trident-use/manage-stor-class.html"
+    - title: 볼륨 작업을 수행합니다
+      url: "/trident-use/vol-operations.html"
+    - title: Astra Trident를 모니터링합니다
+      url: "/trident-use/monitor-trident.html"
+  - title: 데모 자습서
+    links:
+    - title: Astra Trident 비디오
+      url: https://tv.netapp.com/detail/video/5995831475001/using-trident-with-kubernetes
+  - title: 블로그 커뮤니티
+    links:
+    - title: Astra 블로그
+      url: https://cloud.netapp.com/blog/topic/astra
+    - title: Astra Trident 블로그
+      url: https://netapp.io/persistent-storage-provisioner-for-kubernetes/
+    - title: 쿠버네티스 허브
+      url: https://cloud.netapp.com/kubernetes-hub
+    - title: NetApp.IO를 참조하십시오
+      url: https://netapp.io/
+    - title: 불화
+      url: https://discord.gg/NetApp

@@ -1,0 +1,54 @@
+---
+section: trident-use
+title: Astra Trident를 사용해 보십시오
+entries:
+- title: 백엔드 구성
+  url: "/trident-use/backends.html"
+  entries:
+  - title: ANF 백엔드를 구성합니다
+    url: "/trident-use/anf.html"
+  - title: CVS for GCP 백엔드를 구성합니다
+    url: "/trident-use/gcp.html"
+  - title: NetApp HCI 또는 SolidFire 백엔드를 구성합니다
+    url: "/trident-use/element.html"
+  - title: ONTAP SAN 드라이버를 사용하여 백엔드를 구성합니다
+    url: "/trident-use/ontap-san.html"
+    entries:
+    - title: 준비
+      url: "/trident-use/ontap-san-prep.html"
+    - title: 구성 옵션 및 예
+      url: "/trident-use/ontap-san-examples.html"
+  - title: ONTAP NAS 드라이버를 사용하여 백엔드를 구성합니다
+    url: "/trident-use/ontap-nas.html"
+    entries:
+    - title: 준비
+      url: "/trident-use/ontap-nas-prep.html"
+    - title: 구성 옵션 및 예
+      url: "/trident-use/ontap-nas-examples.html"
+  - title: NetApp ONTAP용 Amazon FSx와 함께 Astra Trident를 사용하십시오
+    url: "/trident-use/trident-fsx.html"
+- title: kubectl로 백엔드를 만듭니다
+  url: "/trident-use/backend-kubectl.html"
+- title: kubeck을 사용하여 백엔드 관리 수행
+  url: "/trident-use/backend_ops_kubectl.html"
+- title: tridentctl을 사용하여 백엔드 관리를 수행합니다
+  url: "/trident-use/backend_ops_tridentctl.html"
+- title: 백엔드 관리 옵션 간 이동
+  url: "/trident-use/backend_options.html"
+- title: 스토리지 클래스를 관리합니다
+  url: "/trident-use/manage-stor-class.html"
+- title: 볼륨 작업을 수행합니다
+  url: "/trident-use/vol-operations.html"
+  entries:
+  - title: CSI 토폴로지를 사용합니다
+    url: "/trident-use/csi-topology.html"
+  - title: 스냅샷 작업
+    url: "/trident-use/vol-snapshots.html"
+  - title: 볼륨 확장
+    url: "/trident-use/vol-expansion.html"
+  - title: 볼륨 가져오기
+    url: "/trident-use/vol-import.html"
+- title: 작업자 노드를 준비합니다
+  url: "/trident-use/worker-node-prep.html"
+- title: Astra Trident를 모니터링합니다
+  url: "/trident-use/monitor-trident.html"

@@ -1,0 +1,70 @@
+---
+sidebar: sidebar 
+permalink: trident-use/backend_ops_kubectl.html 
+keywords: backends, storage system, anf, cvs for aws, cvs for gcp, element, hci, solidfire, ontap, aff, fas, ontap select, configure backends, kubectl, create backends, delete backends, update backends, view backends 
+summary: '을 사용하여 백엔드 관리 작업을 수행하는 방법에 대해 알아봅니다 `kubectl`.' 
+---
+= kubeck을 사용하여 백엔드 관리 수행
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+을 사용하여 백엔드 관리 작업을 수행하는 방법에 대해 알아봅니다 `kubectl`.
+
+
+
+== 백엔드를 삭제합니다
+
+를 삭제합니다 `TridentBackendConfig`, Astra Trident가 백엔드 삭제/보존(을 기반으로 함)을 수행하도록 지시합니다 `deletionPolicy`)를 클릭합니다. 백엔드를 삭제하려면 을 확인하십시오 `deletionPolicy` 가 삭제되도록 설정되어 있습니다. 을 눌러 만 삭제합니다 `TridentBackendConfig`을 참조하십시오 `deletionPolicy` 유지로 설정되어 있습니다. 이렇게 하면 백엔드가 계속 존재하고 를 사용하여 관리할 수 있습니다 `tridentctl`.
+
+다음 명령을 실행합니다.
+
+[listing]
+----
+kubectl delete tbc <tbc-name> -n trident
+----
+Astra Trident는 에서 사용 중인 Kubernetes Secrets를 삭제하지 않습니다 `TridentBackendConfig`. Kubernetes 사용자는 기밀을 정해야 합니다. 비밀 정보를 삭제할 때는 주의해야 합니다. 암호는 백엔드에서 사용하지 않는 경우에만 삭제해야 합니다.
+
+
+
+== 기존 백엔드를 봅니다
+
+다음 명령을 실행합니다.
+
+[listing]
+----
+kubectl get tbc -n trident
+----
+을 실행할 수도 있습니다 `tridentctl get backend -n trident` 또는 `tridentctl get backend -o yaml -n trident` 존재하는 모든 백엔드의 목록을 가져옵니다. 이 목록에는 로 만든 백엔트도 포함됩니다 `tridentctl`.
+
+
+
+== 백엔드를 업데이트합니다
+
+백엔드를 업데이트해야 하는 이유는 여러 가지가 있을 수 있습니다.
+
+* 스토리지 시스템에 대한 자격 증명이 변경되었습니다. 자격 증명을 업데이트하기 위해 에서 사용되는 Kubernetes Secret입니다 `TridentBackendConfig` 객체를 업데이트해야 합니다. Astra Trident가 자동으로 백엔드를 제공된 최신 자격 증명으로 업데이트합니다. 다음 명령을 실행하여 Kubernetes Secret를 업데이트하십시오.
+
+
+[listing]
+----
+kubectl apply -f <updated-secret-file.yaml> -n trident
+----
+* 매개 변수(예: 사용 중인 ONTAP SVM의 이름)를 업데이트해야 합니다. 이 경우 `TridentBackendConfig` Kubernetes를 통해 오브젝트를 직접 업데이트할 수 있습니다.
+
+
+[listing]
+----
+kubectl apply -f <updated-backend-file.yaml>
+----
+또는 기존 을 변경합니다 `TridentBackendConfig` 다음 명령을 실행하여 CR을 실행합니다.
+
+[listing]
+----
+kubectl edit tbc <tbc-name> -n trident
+----
+백엔드 업데이트에 실패하면 백엔드는 마지막으로 알려진 구성으로 계속 유지됩니다. 를 실행하여 로그를 보고 원인을 확인할 수 있습니다 `kubectl get tbc <tbc-name> -o yaml -n trident` 또는 `kubectl describe tbc <tbc-name> -n trident`.
+
+구성 파일의 문제를 확인하고 수정한 후 update 명령을 다시 실행할 수 있습니다.

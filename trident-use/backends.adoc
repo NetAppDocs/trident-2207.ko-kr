@@ -1,0 +1,22 @@
+---
+sidebar: sidebar 
+permalink: trident-use/backends.html 
+keywords: backends, storage system, anf, cvs for gcp, element, hci, solidfire, ontap, aff, fas, ontap select, configure backends, fsx 
+summary: 백엔드는 Astra Trident와 스토리지 시스템 간의 관계를 정의합니다. Astra Trident가 스토리지 시스템과 통신하는 방법과 Astra Trident가 스토리지 시스템에서 볼륨을 프로비저닝하는 방법을 알려줍니다. Astra Trident는 스토리지 클래스에 정의된 요구 사항과 일치하는 백엔드에서 스토리지 풀을 자동으로 제공합니다. 사용 중인 스토리지 시스템 유형에 따라 백엔드를 구성하는 방법에 대해 자세히 알아보십시오. 
+---
+= 백엔드 구성
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+백엔드는 Astra Trident와 스토리지 시스템 간의 관계를 정의합니다. Astra Trident가 스토리지 시스템과 통신하는 방법과 Astra Trident가 스토리지 시스템에서 볼륨을 프로비저닝하는 방법을 알려줍니다. Astra Trident는 스토리지 클래스에 정의된 요구 사항과 일치하는 백엔드에서 스토리지 풀을 자동으로 제공합니다. 사용 중인 스토리지 시스템 유형에 따라 백엔드를 구성하는 방법에 대해 자세히 알아보십시오.
+
+* link:anf.html["Azure NetApp Files 백엔드를 구성합니다"^]
+* link:gcp.html["Google Cloud Platform 백엔드에 Cloud Volumes Service를 구성합니다"^]
+* link:element.html["NetApp HCI 또는 SolidFire 백엔드를 구성합니다"^]
+* link:ontap-nas.html["ONTAP 또는 Cloud Volumes ONTAP NAS 드라이버를 사용하여 백엔드를 구성합니다"^]
+* link:ontap-san.html["ONTAP 또는 Cloud Volumes ONTAP SAN 드라이버를 사용하여 백엔드를 구성합니다"^]
+* link:trident-fsx.html["NetApp ONTAP용 Amazon FSx와 함께 Astra Trident를 사용하십시오"^]
+

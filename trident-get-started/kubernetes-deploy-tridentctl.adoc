@@ -1,0 +1,132 @@
+---
+sidebar: sidebar 
+permalink: trident-get-started/kubernetes-deploy-tridentctl.html 
+keywords: deploy, astra trident, methods, tridentctl 
+summary: '을 사용하여 Astra Trident를 배포할 수 있습니다 `tridentctl`.' 
+---
+= tridentctl을 사용하여 배포합니다
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+을 사용하여 Astra Trident를 배포할 수 있습니다 `tridentctl`.
+
+
+TIP: 에 아직 익숙하지 않은 경우 link:../trident-concepts/intro.html["기본 개념"^]이제 아주 좋은 시간입니다.
+
+
+TIP: 배포를 사용자 지정하려면 을 참조하십시오 link:kubernetes-customize-deploy-tridentctl.html["여기"^].
+
+Astra Trident를 구축하려면 다음과 같은 사전 요구 사항을 충족해야 합니다.
+
+* 지원되는 Kubernetes 클러스터에 대한 모든 권한이 있습니다.
+* 지원되는 NetApp 스토리지 시스템에 액세스할 수 있습니다.
+* 모든 Kubernetes 작업자 노드에서 볼륨을 마운트할 수 있습니다.
+* 에 Linux 호스트가 있습니다 `kubectl` (또는 `oc`, OpenShift를 사용하는 경우) 사용하려는 Kubernetes 클러스터를 관리하도록 설치 및 구성한 것입니다.
+* 을(를) 설정했습니다 `KUBECONFIG` Kubernetes 클러스터 구성을 가리키는 환경 변수
+* 을(를) 활성화했습니다 link:requirements.html["Astra Trident에서 요구하는 기능 게이트"^].
+* Docker Enterprise와 함께 Kubernetes를 사용하는 경우, https://docs.docker.com/ee/ucp/user-access/cli/["다음 단계에 따라 CLI 액세스를 설정합니다"^].
+
+
+다 잡았나요? 좋습니다! 그럼 이제 시작하겠습니다.
+
+
+TIP: 배포 사용자 지정에 대한 자세한 내용은 을 참조하십시오 link:kubernetes-customize-deploy-tridentctl.html["여기"^].
+
+
+
+== 1단계: Kubernetes 클러스터 검증
+
+가장 먼저 해야 할 일은 Linux 호스트에 로그인하여 해당 호스트가 관리 중인 _ 작업 _ 을(를) 관리하고 있는지 확인하는 것입니다. link:requirements.html["지원되는 Kubernetes 클러스터"^] 에 필요한 권한이 있어야 합니다.
+
+
+NOTE: OpenShift를 사용하면 을 사용할 수 있습니다 `oc` 대신 `kubectl` 다음 모든 예에서 를 실행하여 먼저 * system:admin * 으로 로그인해야 합니다 `oc login -u system:admin` 또는 `oc login -u kube-admin`.
+
+Kubernetes 버전을 확인하려면 다음 명령을 실행합니다.
+
+[listing]
+----
+kubectl version
+----
+Kubernetes 클러스터 관리자 권한이 있는지 확인하려면 다음 명령을 실행합니다.
+
+[listing]
+----
+kubectl auth can-i '*' '*' --all-namespaces
+----
+Docker Hub에서 이미지를 사용하는 Pod를 시작하고 Pod 네트워크를 통해 스토리지 시스템에 연결할 수 있는지 확인하려면 다음 명령을 실행합니다.
+
+[listing]
+----
+kubectl run -i --tty ping --image=busybox --restart=Never --rm -- \
+  ping <management IP>
+----
+Kubernetes 서버 버전을 식별하십시오. Astra Trident를 설치할 때 사용합니다.
+
+
+
+== 2단계: 설치 프로그램을 다운로드하고 압축을 풉니다
+
+
+NOTE: Trident 설치 관리자는 Trident Pod를 생성하고 상태를 유지하는 데 사용되는 CRD 객체를 구성하며, 클러스터 호스트에 볼륨 프로비저닝 및 연결과 같은 작업을 수행하는 CSI 사이드카를 초기화합니다.
+
+에서 최신 버전의 Trident 설치 프로그램 번들을 다운로드하여 압축을 풀 수 있습니다 link:https://github.com/NetApp/trident/releases/latest["GitHub의 _Assets_섹션"^].
+
+예를 들어, 최신 버전이 21.07.1인 경우:
+
+[listing]
+----
+wget https://github.com/NetApp/trident/releases/download/v21.07.1/trident-installer-21.07.1.tar.gz
+tar -xf trident-installer-21.07.1.tar.gz
+cd trident-installer
+----
+
+
+== 3단계: Astra Trident 설치
+
+를 실행하여 원하는 네임스페이스에 Astra Trident를 설치합니다 `tridentctl install` 명령.
+
+[listing]
+----
+./tridentctl install -n trident
+....
+INFO Starting Trident installation.                namespace=trident
+INFO Created service account.
+INFO Created cluster role.
+INFO Created cluster role binding.
+INFO Added finalizers to custom resource definitions.
+INFO Created Trident service.
+INFO Created Trident secret.
+INFO Created Trident deployment.
+INFO Created Trident daemonset.
+INFO Waiting for Trident pod to start.
+INFO Trident pod started.                          namespace=trident pod=trident-csi-679648bd45-cv2mx
+INFO Waiting for Trident REST interface.
+INFO Trident REST interface is up.                 version=21.07.1
+INFO Trident installation succeeded.
+....
+----
+설치 프로그램이 완료되면 다음과 같이 표시됩니다. Kubernetes 클러스터의 노드 수에 따라 다음과 같은 Pod를 더 많이 관찰할 수 있습니다.
+
+[listing]
+----
+kubectl get pod -n trident
+NAME                           READY   STATUS    RESTARTS   AGE
+trident-csi-679648bd45-cv2mx   4/4     Running   0          5m29s
+trident-csi-vgc8n              2/2     Running   0          5m29s
+
+./tridentctl -n trident version
++----------------+----------------+
+| SERVER VERSION | CLIENT VERSION |
++----------------+----------------+
+| 21.07.1        | 21.07.1        |
++----------------+----------------+
+----
+위 예제와 유사한 출력이 표시되는 경우 이 단계를 완료했지만 Astra Trident가 아직 완전히 구성되지 않은 것입니다. 다음 단계를 계속 진행하십시오. 을 참조하십시오 link:kubernetes-postdeployment.html["구축 후 작업"^].
+
+그러나 설치 프로그램이 성공적으로 완료되지 않거나 * Running * 이 표시되지 않는 경우 `trident-csi-<generated id>`, 플랫폼이 설치되지 않았습니다.
+
+
+TIP: 배포 중 문제 해결에 대한 자세한 내용은 을 참조하십시오 link:../troubleshooting.html["문제 해결"^] 섹션을 참조하십시오.

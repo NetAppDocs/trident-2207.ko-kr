@@ -1,0 +1,22 @@
+---
+section: trident-get-started
+title: 시작하십시오
+entries:
+- title: 시도해 보십시오
+  url: "/trident-get-started/quickstart.html"
+- title: 요구 사항
+  url: "/trident-get-started/requirements.html"
+- title: 구축 개요
+  url: "/trident-get-started/kubernetes-deploy.html"
+- title: Trident 연산자를 사용하여 구축
+  url: "/trident-get-started/kubernetes-deploy-operator.html"
+  entries:
+  - title: Trident 운영자 배포를 사용자 지정합니다
+    url: "/trident-get-started/kubernetes-customize-deploy.html"
+- title: tridentctl을 사용하여 배포합니다
+  url: "/trident-get-started/kubernetes-deploy-tridentctl.html"
+  entries:
+  - title: tridentctl 배포를 사용자 지정합니다
+    url: "/trident-get-started/kubernetes-customize-deploy-tridentctl.html"
+- title: 다음 단계
+  url: "/trident-get-started/kubernetes-postdeployment.html"

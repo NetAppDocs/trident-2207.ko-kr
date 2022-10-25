@@ -1,0 +1,132 @@
+---
+sidebar: sidebar 
+permalink: trident-docker/volumes-docker.html 
+keywords: create volumes, astra trident, trident for docker, docker, docker volume 
+summary: '볼륨을 생성하려면 표준을 사용합니다 `docker volume` 필요한 경우 지정된 Astra Trident 드라이버 이름의 명령입니다.' 
+---
+= 볼륨 작업
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+표준을 사용하여 볼륨을 쉽게 생성, 클론 복제 및 제거할 수 있습니다 `docker volume` 필요한 경우 지정된 Astra Trident 드라이버 이름의 명령입니다.
+
+
+
+== 볼륨을 생성합니다
+
+* 기본 이름을 사용하여 드라이버로 볼륨을 생성합니다.
++
+[listing]
+----
+docker volume create -d netapp --name firstVolume
+----
+* 특정 Astra Trident 인스턴스를 사용하여 볼륨 생성:
++
+[listing]
+----
+docker volume create -d ntap_bronze --name bronzeVolume
+----
++
+
+NOTE: 지정하지 않은 경우 link:volume-driver-options.html["옵션"^], 드라이버 기본값이 사용됩니다.
+
+* 기본 볼륨 크기를 재정의합니다. 다음 예를 참조하여 드라이버로 20GiB 볼륨을 생성합니다.
++
+[listing]
+----
+docker volume create -d netapp --name my_vol --opt size=20G
+----
++
+
+TIP: 볼륨 크기는 옵션 단위(예: 10G, 20GB, 3TiB)가 포함된 정수 값이 포함된 문자열로 표시됩니다. 단위를 지정하지 않으면 기본값은 G입니다 크기 단위는 2(B, KiB, MiB, GiB, TiB) 또는 10(B, KB, MB, GB, TB)의 거듭제곱으로 표현될 수 있습니다. 단축 단위는 2의 거듭제곱을 사용합니다(G=GiB, T=TiB,…).
+
+
+
+
+
+== 볼륨을 제거합니다
+
+* 다른 Docker 볼륨과 마찬가지로 볼륨을 제거합니다.
++
+[listing]
+----
+docker volume rm firstVolume
+----
++
+
+IMPORTANT: 를 사용할 때 `solidfire-san` 드라이버, 위의 예에서는 볼륨을 삭제 및 삭제합니다.
+
+
+
+Docker를 위한 Astra Trident를 업그레이드하려면 다음 단계를 수행하십시오.
+
+
+
+== 볼륨의 클론을 생성합니다
+
+를 사용할 때 `ontap-nas`, `ontap-san`, `solidfire-san`, 및 `gcp-cvs storage drivers`, Astra Trident는 볼륨을 복제할 수 있습니다. 를 사용할 때 `ontap-nas-flexgroup` 또는 `ontap-nas-economy` 드라이버, 복제는 지원되지 않습니다. 기존 볼륨에서 새 볼륨을 생성하면 새 스냅샷이 생성됩니다.
+
+* 볼륨을 검사하여 스냅샷을 열거합니다.
++
+[listing]
+----
+docker volume inspect <volume_name>
+----
+* 기존 볼륨에서 새 볼륨을 생성합니다. 이렇게 하면 새 스냅샷이 생성됩니다.
++
+[listing]
+----
+docker volume create -d <driver_name> --name <new_name> -o from=<source_docker_volume>
+----
+* 볼륨의 기존 스냅샷에서 새 볼륨을 생성합니다. 새 스냅샷은 생성하지 않습니다.
++
+[listing]
+----
+docker volume create -d <driver_name> --name <new_name> -o from=<source_docker_volume> -o fromSnapshot=<source_snap_name>
+----
+
+
+
+
+=== 예
+
+[listing]
+----
+docker volume inspect firstVolume
+
+[
+    {
+        "Driver": "ontap-nas",
+        "Labels": null,
+        "Mountpoint": "/var/lib/docker-volumes/ontap-nas/netappdvp_firstVolume",
+        "Name": "firstVolume",
+        "Options": {},
+        "Scope": "global",
+        "Status": {
+            "Snapshots": [
+                {
+                    "Created": "2017-02-10T19:05:00Z",
+                    "Name": "hourly.2017-02-10_1505"
+                }
+            ]
+        }
+    }
+]
+
+docker volume create -d ontap-nas --name clonedVolume -o from=firstVolume
+clonedVolume
+
+docker volume rm clonedVolume
+docker volume create -d ontap-nas --name volFromSnap -o from=firstVolume -o fromSnapshot=hourly.2017-02-10_1505
+volFromSnap
+
+docker volume rm volFromSnap
+----
+
+
+== 외부에서 생성된 볼륨에 액세스합니다
+
+파티션이 없고 파일 시스템이 Astra Trident(예: an)에서 지원되는 경우 Trident * Oonly * 를 사용하여 컨테이너를 통해 외부에서 생성된 블록 장치(또는 해당 클론)에 액세스할 수 있습니다 `ext4`형식 지정됨 `/dev/sdc1` Astra Trident를 통해 액세스할 수 없음).

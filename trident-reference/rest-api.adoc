@@ -1,0 +1,50 @@
+---
+sidebar: sidebar 
+permalink: trident-reference/rest-api.html 
+keywords: rest api, get, post, json, object, backends 
+summary: Astra Trident의 REST API와 상호 작용하려는 경우 REST 엔드포인트를 직접 사용할 수 있습니다. 
+---
+= Astra Trident REST API
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+있습니다 link:tridentctl.html["tridentctl 명령 및 옵션"^] 는 Astra Trident의 REST API와 상호 작용하는 가장 쉬운 방법이며, 원할 경우 REST 엔드포인트를 직접 사용할 수 있습니다.
+
+이 기능은 Kubernetes가 아닌 구축 환경에서 Astra Trident를 독립 실행형 바이너리로 사용하는 고급 설치에 유용합니다.
+
+더 나은 보안을 위해 Astra Trident's `REST API` 는 POD 내에서 실행할 때 기본적으로 localhost로 제한됩니다. 이 동작을 변경하려면 Astra Trident를 설정해야 합니다 `-address` 인수가 해당 POD 구성의 인수입니다.
+
+API는 다음과 같이 작동합니다.
+
+
+
+== 가져오기
+
+* `GET <trident-address>/trident/v1/<object-type>`: 해당 형식의 모든 개체를 나열합니다.
+* `GET <trident-address>/trident/v1/<object-type>/<object-name>`( Control 에서 상속됨): 명명된 개체의 세부 정보를 가져옵니다.
+
+
+
+
+== 게시
+
+`POST <trident-address>/trident/v1/<object-type>`: 지정된 형식의 개체를 만듭니다.
+
+* 생성할 개체의 JSON 구성이 필요합니다. 각 개체 유형의 사양은 링크 tridentctl.html 을 참조하십시오[`tridentctl` 명령 및 옵션].
+* 개체가 이미 있는 경우 동작이 달라집니다. backends는 기존 개체를 업데이트하지만 다른 모든 개체 형식은 작업에 실패합니다.
+
+
+
+
+== 삭제
+
+`DELETE <trident-address>/trident/v1/<object-type>/<object-name>`: 명명된 리소스를 삭제합니다.
+
+
+NOTE: 백엔드 또는 스토리지 클래스와 연결된 볼륨은 계속 존재하므로 별도로 삭제해야 합니다. 자세한 내용은 링크: tridentctl.html 을 참조하십시오[`tridentctl` 명령 및 옵션].
+
+이러한 API의 호출 방법에 대한 예제를 보려면 디버그를 전달합니다 (`-d`) 깃발. 자세한 내용은 링크: tridentctl.html 을 참조하십시오[`tridentctl` 명령 및 옵션].

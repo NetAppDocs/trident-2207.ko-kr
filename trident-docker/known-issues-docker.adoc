@@ -1,0 +1,63 @@
+---
+sidebar: sidebar 
+permalink: trident-docker/known-issues-docker.html 
+keywords: known issues, trident, trident for docker, docker 
+summary: Docker와 함께 Astra Trident를 사용할 때 알려진 문제에 대한 정보를 확인하십시오. 
+---
+= 알려진 문제 및 제한 사항
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+Docker에서 Astra Trident를 사용할 때 알려진 문제 및 제한 사항에 대한 정보를 확인하십시오.
+
+
+
+== 이전 버전에서 Trident Docker 볼륨 플러그인을 20.10 이상으로 업그레이드하면 해당 파일 또는 디렉터리 오류가 없는 업그레이드 오류가 발생합니다.
+
+.해결 방법
+. 플러그인을 비활성화합니다.
++
+[listing]
+----
+docker plugin disable -f netapp:latest
+----
+. 플러그인을 제거합니다.
++
+[listing]
+----
+docker plugin rm -f netapp:latest
+----
+. 추가 를 제공하여 플러그인을 다시 설치합니다 `config` 매개 변수.
++
+[listing]
+----
+docker plugin install netapp/trident-plugin:20.10 --alias netapp --grant-all-permissions config=config.json
+----
+
+
+
+
+== 볼륨 이름은 최소 2자 이상이어야 합니다.
+
+
+NOTE: 이는 Docker 클라이언트의 제한 사항입니다. 클라이언트는 단일 문자 이름을 Windows 경로로 해석합니다. https://github.com/moby/moby/issues/25773["버그 25773을 참조하십시오"^].
+
+
+
+== Docker Swarm에는 Astra Trident가 모든 스토리지 및 드라이버 조합에서 이를 지원하지 않는 특정 동작이 있습니다.
+
+* 현재 Docker Swarm은 볼륨 ID 대신 볼륨 이름을 고유한 볼륨 식별자로 사용합니다.
+* 볼륨 요청은 Swarm 클러스터의 각 노드로 동시에 전송됩니다.
+* 볼륨 플러그인(Astra Trident 포함)은 Swarm 클러스터의 각 노드에서 독립적으로 실행해야 합니다. ONTAP의 작동 방식 및 방법 때문입니다 `ontap-nas` 및 `ontap-san` 운전자 기능, 이러한 제한 내에서 작동할 수 있는 유일한 운전자이다.
+
+
+나머지 드라이버에는 명확한 "승자" 없이 단일 요청에 대해 대량의 볼륨을 생성할 수 있는 경합 상태와 같은 문제가 있습니다. 예를 들어, Element에는 볼륨의 이름이 같지만 ID가 다를 수 있는 기능이 있습니다.
+
+NetApp은 Docker 팀에 피드백을 제공했지만, 향후 소구에 대한 표시는 제공하지 않습니다.
+
+
+
+== FlexGroup를 프로비저닝하고 있는 경우, 두 번째 FlexGroup에 프로비저닝되는 FlexGroup와 공통되는 하나 이상의 애그리게이트가 있는 경우 ONTAP는 두 번째 FlexGroup를 프로비저닝하지 않습니다.

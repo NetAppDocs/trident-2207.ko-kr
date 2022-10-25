@@ -1,0 +1,854 @@
+---
+sidebar: sidebar 
+permalink: trident-docker/stor-config.html 
+keywords: deploy, trident, docker, trident for docker, nfs, iscsi, protcol, nfs protocol, iscsi protocol, configure host, host config, storage config, options, variables, ontap, element, cvs on gcp, anf, azure netapp files 
+summary: Astra Trident 구성에 사용할 수 있는 구성 옵션을 확인하십시오. 
+---
+= 스토리지 구성 옵션
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+Astra Trident 구성에 사용할 수 있는 구성 옵션을 확인하십시오.
+
+
+
+== 글로벌 구성 옵션
+
+이러한 구성 옵션은 사용 중인 스토리지 플랫폼에 관계없이 모든 Astra Trident 구성에 적용됩니다.
+
+[cols="3*"]
+|===
+| 옵션을 선택합니다 | 설명 | 예 
+
+
+| `version`  a| 
+구성 파일 버전 번호입니다
+ a| 
+1
+
+
+
+| `storageDriverName`  a| 
+스토리지 드라이버 이름입니다
+ a| 
+`ontap-nas`, `ontap-san`, `ontap-nas-economy`,
+`ontap-nas-flexgroup`, `solidfire-san`, `azure-netapp-files`, 또는 `gcp-cvs`
+
+
+
+| `storagePrefix`  a| 
+볼륨 이름에 대한 선택적 접두사입니다. 기본값: “netapdvp_”.
+ a| 
+스테이징 _
+
+
+
+| `limitVolumeSize`  a| 
+볼륨 크기에 대한 선택적 제한. 기본값: ""(강제 적용 안 됨)
+ a| 
+10G
+
+|===
+
+TIP: 사용하지 마십시오 `storagePrefix` 요소 백엔드에 대한 (기본값 포함). 기본적으로 은(는) 입니다 `solidfire-san` 드라이버는 이 설정을 무시하고 접두어를 사용하지 않습니다. Docker 볼륨 매핑에 특정 tenantID를 사용하거나 이름 문지가 사용된 경우 Docker의 Docker 버전, 드라이버 정보 및 원시 이름으로 채워진 특성 데이터를 사용하는 것이 좋습니다.
+
+생성하는 모든 볼륨에서 기본 옵션을 지정하지 않아도 됩니다. 를 클릭합니다 `size` 옵션은 모든 컨트롤러 유형에 사용할 수 있습니다. 기본 볼륨 크기를 설정하는 방법은 ONTAP 구성 섹션을 참조하십시오.
+
+[cols="3*"]
+|===
+| 옵션을 선택합니다 | 설명 | 예 
+
+
+| `size`  a| 
+새 볼륨의 선택적 기본 크기입니다. 기본값: “1G”
+ a| 
+10G
+
+|===
+
+
+== ONTAP 구성
+
+위의 글로벌 구성 값 외에도 ONTAP를 사용할 경우 다음과 같은 최상위 옵션을 사용할 수 있습니다.
+
+[cols="3*"]
+|===
+| 옵션을 선택합니다 | 설명 | 예 
+
+
+| `managementLIF`  a| 
+ONTAP 관리 LIF의 IP 주소입니다. FQDN(정규화된 도메인 이름)을 지정할 수 있습니다.
+ a| 
+10.0.0.1
+
+
+
+| `dataLIF`  a| 
+프로토콜 LIF의 IP 주소이며 지정하지 않을 경우 파생됩니다. 의 경우 `ontap-nas` 드라이버 * 전용 *, FQDN을 지정할 수 있으며, 이 경우 FQDN이 NFS 마운트 작업에 사용됩니다. 의 경우 `ontap-san` 기본값은 SVM의 모든 데이터 LIF IP를 사용하고 iSCSI 다중 경로를 사용하는 것입니다. 의 IP 주소 지정 `dataLIF` 의 경우 `ontap-san` 드라이버는 드라이버가 다중 경로를 비활성화하고 지정된 주소만 사용하도록 합니다.
+ a| 
+10.0.0.2
+
+
+
+| `svm`  a| 
+사용할 스토리지 가상 머신(관리 LIF가 클러스터 LIF인 경우 필요)
+ a| 
+SVM_NFS 를 클릭합니다
+
+
+
+| `username`  a| 
+스토리지 디바이스에 접속할 사용자 이름입니다
+ a| 
+vsadmin을 선택합니다
+
+
+
+| `password`  a| 
+스토리지 디바이스에 연결하는 암호입니다
+ a| 
+비밀
+
+
+
+| `aggregate`  a| 
+프로비저닝을 위한 애그리게이트(선택 사항, SVM에 셋팅해야 하는 경우) 의 경우 `ontap-nas-flexgroup` 드라이버, 이 옵션은 무시됩니다. SVM에 할당된 모든 애그리게이트는 FlexGroup 볼륨을 프로비저닝하는 데 사용됩니다.
+ a| 
+aggr1
+
+
+
+| `limitAggregateUsage`  a| 
+선택 사항으로, 사용량이 이 백분율보다 높을 경우 용량 할당에 실패합니다
+ a| 
+75%
+
+
+
+| `nfsMountOptions`  a| 
+NFS 마운트 옵션을 세밀하게 제어합니다. 기본값은 "-o nfsvers=3"입니다. * 에서만 사용할 수 있습니다 `ontap-nas` 및 `ontap-nas-economy` 드라이버 *. https://www.netapp.com/pdf.html?item=/media/10720-tr-4067.pdf["NFS 호스트 구성 정보는 여기 를 참조하십시오"^].
+ a| 
+o nfsvers = 4
+
+
+
+| `igroupName`  a| 
+플러그인에서 사용되는 igroup. 기본값은 “netapdvp”입니다. * ONTAP-SAN driver * 에서만 사용 가능.
+ a| 
+myigroup
+
+
+
+| `limitVolumeSize`  a| 
+최대 요청 가능 볼륨 크기 및 qtree 상위 볼륨 크기. 의 경우 * `ontap-nas-economy` 드라이버, 이 옵션은 생성된 FlexVol의 크기를 추가로 제한합니다.
+ a| 
+300g
+
+
+
+| `qtreesPerFlexvol`  a| 
+FlexVol당 최대 qtree는 범위 [50, 300]에 있어야 하며 기본값은 200입니다. 의 경우 * `ontap-nas-economy` 드라이버, 이 옵션을 사용하면 FlexVol*당 최대 qtree 수를 사용자 지정할 수 있습니다.
+ a| 
+300
+
+|===
+생성하는 모든 볼륨에 기본 옵션을 지정하지 않아도 됩니다.
+
+[cols="3*"]
+|===
+| 옵션을 선택합니다 | 설명 | 예 
+
+
+| `spaceReserve`  a| 
+공간 예약 모드, "없음"(씬 프로비저닝) 또는 "볼륨"(일반)
+ a| 
+없음
+
+
+
+| `snapshotPolicy`  a| 
+사용할 스냅샷 정책, 기본값은 "없음"입니다.
+ a| 
+없음
+
+
+
+| `snapshotReserve`  a| 
+Snapshot reserve percentage, 기본값은 ""이며 ONTAP의 기본값을 사용합니다
+ a| 
+10
+
+
+
+| `splitOnClone`  a| 
+생성 시 복제본을 상위 복제본에서 분할합니다. 기본값은 "false"입니다.
+ a| 
+거짓
+
+
+
+| `encryption`  a| 
+새로운 볼륨에 NVE(NetApp Volume Encryption)를 지원하며 기본값은 로 설정됩니다 `false`. 이 옵션을 사용하려면 NVE 라이센스가 클러스터에서 활성화되어 있어야 합니다.
+
+백엔드에서 NAE가 활성화된 경우 Astra Trident에 프로비저닝된 모든 볼륨은 NAE가 활성화됩니다.
+
+자세한 내용은 다음을 참조하십시오. link:../trident-reco/security-reco.html["Astra Trident가 NVE 및 NAE와 연동되는 방식"].
+ a| 
+참
+
+
+
+| `unixPermissions`  a| 
+프로비저닝된 NFS 볼륨에 대한 NAS 옵션, 기본값: “777”
+ a| 
+777
+
+
+
+| `snapshotDir`  a| 
+에 액세스하기 위한 NAS 옵션입니다 `.snapshot` 디렉토리, 기본값 "false"
+ a| 
+참
+
+
+
+| `exportPolicy`  a| 
+사용할 NFS 엑스포트 정책의 NAS 옵션, 기본값: "기본값"
+ a| 
+기본값
+
+
+
+| `securityStyle`  a| 
+프로비저닝된 NFS 볼륨에 액세스하기 위한 NAS 옵션, 기본값은 "UNIX"입니다.
+ a| 
+혼합
+
+
+
+| `fileSystemType`  a| 
+파일 시스템 유형을 선택하는 SAN 옵션, 기본값은 "ext4"로 설정됩니다.
+ a| 
+XFS
+
+
+
+| `tieringPolicy`  a| 
+사용할 계층화 정책, 기본값은 "없음", ONTAP 9.5 이전 SVM-DR 구성의 경우 "스냅샷 전용"입니다
+ a| 
+없음
+
+|===
+
+
+=== 축척 옵션
+
+를 클릭합니다 `ontap-nas` 및 `ontap-san` 드라이버는 각 Docker 볼륨에 대해 ONTAP FlexVol를 생성합니다. ONTAP는 최대 12,000개의 FlexVol 클러스터를 사용하여 클러스터 노드당 최대 1,000개의 FlexVol을 지원합니다. Docker 볼륨 요구 사항이 이러한 제한 범위 내에 있으면 를 참조하십시오 `ontap-nas` 드라이버는 Docker 볼륨 세부 스냅샷 및 클론 복제와 같은 FlexVol에서 제공되는 추가 기능 때문에 선호되는 NAS 솔루션입니다.
+
+FlexVol 제한에 수용 가능한 것보다 더 많은 Docker 볼륨이 필요한 경우 를 선택합니다 `ontap-nas-economy` 또는 을 누릅니다 `ontap-san-economy` 드라이버.
+
+를 클릭합니다 `ontap-nas-economy` 드라이버는 자동으로 관리되는 FlexVol 풀 내에 Docker 볼륨을 ONTAP qtree로 생성합니다. qtree는 일부 기능을 희생하여 클러스터 노드당 최대 100,000 및 클러스터당 2,400,000까지 훨씬 더 뛰어난 확장을 제공합니다. 를 클릭합니다 `ontap-nas-economy` 드라이버는 Docker 볼륨 세부 스냅샷 또는 클론 복제를 지원하지 않습니다.
+
+
+NOTE: 를 클릭합니다 `ontap-nas-economy` Swarm은 여러 노드에서 볼륨 생성을 오케스트레이션하지 않으므로 현재 Docker Swarm에서 드라이버가 지원되지 않습니다.
+
+를 클릭합니다 `ontap-san-economy` 드라이버는 자동으로 관리되는 FlexVol의 공유 풀 내에 Docker 볼륨을 ONTAP LUN으로 생성합니다. 이렇게 하면 각 FlexVol가 하나의 LUN에만 제한되지 않으며 SAN 워크로드에 더 나은 확장성을 제공합니다. 스토리지 시스템에 따라 ONTAP는 클러스터당 최대 16384개의 LUN을 지원합니다. 볼륨이 그 아래에 LUN이 있으므로 이 드라이버는 Docker 볼륨 세부 스냅샷 및 클론 복제를 지원합니다.
+
+를 선택합니다 `ontap-nas-flexgroup` 수십억 개의 파일로 구성된 페타바이트 규모로 성장할 수 있는 단일 볼륨으로 병렬 처리를 늘립니다. FlexGroups의 이상적인 사용 사례로는 AI/ML/DL, 빅데이터 및 분석, 소프트웨어 빌드, 스트리밍, 파일 저장소 등이 있습니다. Trident는 FlexGroup 볼륨을 프로비저닝할 때 SVM에 할당된 모든 애그리게이트를 사용합니다. Trident의 FlexGroup 지원에도 다음과 같은 고려 사항이 있습니다.
+
+* ONTAP 버전 9.2 이상이 필요합니다.
+* 이번 작부터 FlexGroups는 NFS v3만 지원합니다.
+* SVM에 대해 64비트 NFSv3 식별자를 사용하는 것이 좋습니다.
+* 최소 권장 FlexGroup 크기는 100GB입니다.
+* FlexGroup 볼륨에 대해서는 클론 생성이 지원되지 않습니다.
+
+
+FlexGroups에 적합한 FlexGroups 및 워크로드에 대한 자세한 내용은 를 참조하십시오 https://www.netapp.com/pdf.html?item=/media/12385-tr4571pdf.pdf["NetApp FlexGroup 볼륨 모범 사례 및 구현 가이드 를 참조하십시오"^].
+
+같은 환경에서 고급 기능과 대규모 확장을 위해 Docker Volume Plugin의 여러 인스턴스를 를 사용하여 실행할 수 있습니다 `ontap-nas` 또 다른 방법은 을 사용하는 것입니다 `ontap-nas-economy`.
+
+
+
+=== ONTAP 구성 파일의 예
+
+* NFS의 예 `ontap-nas` 드라이버 *
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "ontap-nas",
+    "managementLIF": "10.0.0.1",
+    "dataLIF": "10.0.0.2",
+    "svm": "svm_nfs",
+    "username": "vsadmin",
+    "password": "secret",
+    "aggregate": "aggr1",
+    "defaults": {
+      "size": "10G",
+      "spaceReserve": "none",
+      "exportPolicy": "default"
+    }
+}
+----
+* NFS의 예 `ontap-nas-flexgroup` 드라이버 *
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "ontap-nas-flexgroup",
+    "managementLIF": "10.0.0.1",
+    "dataLIF": "10.0.0.2",
+    "svm": "svm_nfs",
+    "username": "vsadmin",
+    "password": "secret",
+    "defaults": {
+      "size": "100G",
+      "spaceReserve": "none",
+      "exportPolicy": "default"
+    }
+}
+----
+* NFS의 예 `ontap-nas-economy` 드라이버 *
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "ontap-nas-economy",
+    "managementLIF": "10.0.0.1",
+    "dataLIF": "10.0.0.2",
+    "svm": "svm_nfs",
+    "username": "vsadmin",
+    "password": "secret",
+    "aggregate": "aggr1"
+}
+----
+* iSCSI의 예 `ontap-san` 드라이버 *
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "ontap-san",
+    "managementLIF": "10.0.0.1",
+    "dataLIF": "10.0.0.3",
+    "svm": "svm_iscsi",
+    "username": "vsadmin",
+    "password": "secret",
+    "aggregate": "aggr1",
+    "igroupName": "myigroup"
+}
+----
+* NFS의 예 `ontap-san-economy` 드라이버 *
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "ontap-san-economy",
+    "managementLIF": "10.0.0.1",
+    "dataLIF": "10.0.0.3",
+    "svm": "svm_iscsi_eco",
+    "username": "vsadmin",
+    "password": "secret",
+    "aggregate": "aggr1",
+    "igroupName": "myigroup"
+}
+----
+
+
+== Element 소프트웨어 구성
+
+Element 소프트웨어(NetApp HCI/SolidFire)를 사용하는 경우 글로벌 구성 값 외에도 이러한 옵션을 사용할 수 있습니다.
+
+[cols="3*"]
+|===
+| 옵션을 선택합니다 | 설명 | 예 
+
+
+| `Endpoint`  a| 
+https://<login>:<password>@<mvip>/json-rpc/<element-version>[]
+ a| 
+https://admin:admin@192.168.160.3/json-rpc/8.0[]
+
+
+
+| `SVIP`  a| 
+iSCSI IP 주소 및 포트
+ a| 
+10.0.0.7:3260
+
+
+
+| `TenantName`  a| 
+사용할 SolidFireF 테넌트(찾을 수 없는 경우 생성됨)
+ a| 
+“Docker”
+
+
+
+| `InitiatorIFace`  a| 
+iSCSI 트래픽을 기본 인터페이스가 아닌 인터페이스로 제한할 때 인터페이스를 지정합니다
+ a| 
+“기본값”
+
+
+
+| `Types`  a| 
+QoS 사양
+ a| 
+아래 예를 참조하십시오
+
+
+
+| `LegacyNamePrefix`  a| 
+업그레이드된 Trident 설치의 접두사 1.3.2 이전 버전의 Trident를 사용하고 기존 볼륨을 업그레이드하는 경우 이 값을 설정하여 볼륨 이름 방법을 통해 매핑된 이전 볼륨에 액세스해야 합니다.
+ a| 
+“netapdvp-”
+
+|===
+를 클릭합니다 `solidfire-san` 드라이버가 Docker Swarm을 지원하지 않습니다.
+
+
+
+=== Element 소프트웨어 구성 파일의 예
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "solidfire-san",
+    "Endpoint": "https://admin:admin@192.168.160.3/json-rpc/8.0",
+    "SVIP": "10.0.0.7:3260",
+    "TenantName": "docker",
+    "InitiatorIFace": "default",
+    "Types": [
+        {
+            "Type": "Bronze",
+            "Qos": {
+                "minIOPS": 1000,
+                "maxIOPS": 2000,
+                "burstIOPS": 4000
+            }
+        },
+        {
+            "Type": "Silver",
+            "Qos": {
+                "minIOPS": 4000,
+                "maxIOPS": 6000,
+                "burstIOPS": 8000
+            }
+        },
+        {
+            "Type": "Gold",
+            "Qos": {
+                "minIOPS": 6000,
+                "maxIOPS": 8000,
+                "burstIOPS": 10000
+            }
+        }
+    ]
+}
+----
+
+
+== GCP 구성의 Cloud Volumes Service(CVS
+
+Trident는 이제 기본 CVS 서비스 유형을 사용하여 더 작은 볼륨에 대한 지원을 제공합니다 https://cloud.google.com/architecture/partners/netapp-cloud-volumes/service-types["GCP"^]. 로 만든 백엔드의 경우 `storageClass=software`이제 볼륨에 최소 프로비저닝 크기가 300GiB가 됩니다. * NetApp은 고객이 비운영 워크로드에 1TiB 미만의 볼륨을 사용할 것을 권장합니다 *. CVS는 현재 제어된 가용성 하에서 이 기능을 제공하며 기술 지원을 제공하지 않습니다.
+
+
+NOTE: 1TiB 미만의 볼륨에 액세스하려면 등록하십시오 https://docs.google.com/forms/d/e/1FAIpQLSc7_euiPtlV8bhsKWvwBl3gm9KUL4kOhD7lnbHC3LlQ7m02Dw/viewform["여기"^].
+
+
+WARNING: 기본 CVS 서비스 유형을 사용하여 백엔드를 배포할 때 `storageClass=software`의 경우 GCP에서 해당 프로젝트 번호 및 프로젝트 ID에 대한 1TiB 미만의 볼륨 기능에 액세스할 수 있어야 합니다. Trident에서 1TiB 미만의 볼륨을 프로비저닝하는 데 이 작업이 필요합니다. 그렇지 않은 경우, 600GiB 미만의 PVC에 대해 체적 생성 * 이 실패합니다. 를 사용하여 1TiB 미만의 볼륨에 대한 액세스 권한을 얻습니다 https://docs.google.com/forms/d/e/1FAIpQLSc7_euiPtlV8bhsKWvwBl3gm9KUL4kOhD7lnbHC3LlQ7m02Dw/viewform["이 양식입니다"^].
+
+Trident에서 기본 CVS 서비스 수준을 위해 생성한 볼륨은 다음과 같이 프로비저닝됩니다.
+
+* 300GiB보다 작은 PVC로 인해 Trident가 300GiB CVS 볼륨을 생성합니다.
+* 300GiB에서 600GiB 사이인 PVC로 인해 Trident가 요청된 크기의 CVS 볼륨을 생성합니다.
+* PVCs가 600GiB에서 1TiB 사이인 경우 Trident가 1TiB CVS 볼륨을 생성합니다.
+* 1TiB보다 큰 PVC로 인해 Trident가 요청된 크기의 CVS 볼륨을 생성합니다.
+
+
+글로벌 구성 값 외에도 GCP에서 CVS를 사용할 경우 이러한 옵션을 사용할 수 있습니다.
+
+[cols="3*"]
+|===
+| 옵션을 선택합니다 | 설명 | 예 
+
+
+| `apiRegion`  a| 
+CVS 계정 지역(필수) 이 백엔드에서 볼륨을 프로비저닝할 GCP 영역입니다.
+ a| 
+"미국 2"
+
+
+
+| `projectNumber`  a| 
+GCP 프로젝트 번호(필수). GCP 웹 포털의 홈 화면에서 찾을 수 있습니다.
+ a| 
+“123456789012”
+
+
+
+| `hostProjectNumber`  a| 
+GCP 공유 VPC 호스트 프로젝트 번호(공유 VPC를 사용하는 경우 필요)
+ a| 
+“098765432109”
+
+
+
+| `apiKey`  a| 
+CVS 관리자 역할을 가진 GCP 서비스 계정의 API 키입니다(필수). 은 GCP 서비스 계정의 개인 키 파일(백엔드 구성 파일에 verbatim 복사)의 JSON 형식 컨텐츠입니다. 서비스 계정에 netappcloudvolumes.admin 역할이 있어야 합니다.
+ a| 
+(개인 키 파일의 내용)
+
+
+
+| `secretKey`  a| 
+CVS 계정 비밀 키(필수). CVS 웹 포털의 계정 설정 > API 액세스에서 찾을 수 있습니다.
+ a| 
+“기본값”
+
+
+
+| `proxyURL`  a| 
+프록시 서버가 CVS 계정에 연결해야 하는 경우 프록시 URL입니다. 프록시 서버는 HTTP 프록시 또는 HTTPS 프록시일 수 있습니다. HTTPS 프록시의 경우 프록시 서버에서 자체 서명된 인증서를 사용할 수 있도록 인증서 유효성 검사를 건너뜁니다. * 인증이 활성화된 프록시 서버는 지원되지 않습니다 *.
+ a| 
+“http://proxy-server-hostname/” 참조하십시오
+
+
+
+| `nfsMountOptions`  a| 
+NFS 마운트 옵션, 기본값: "-o nfsvers=3"
+ a| 
+“nfsvers=3, proto=tcp, timeo=600”
+
+
+
+| `serviceLevel`  a| 
+성능 수준(표준, 프리미엄, 익스트림), 기본값: "표준"
+ a| 
+“프리미엄”
+
+
+
+| `network`  a| 
+CVS 볼륨에 사용되는 GCP 네트워크, 기본값: “기본값”
+ a| 
+“기본값”
+
+|===
+
+NOTE: 공유 VPC 네트워크를 사용하는 경우 둘 다 지정해야 합니다 `projectNumber` 및 `hostProjectNumber`. 이 경우 `projectNumber` 은(는) 서비스 프로젝트입니다 `hostProjectNumber` 는 호스트 프로젝트입니다.
+
+
+NOTE: NetApp Cloud Volumes Service for GCP는 크기 100GiB 미만의 CVS - 성능 볼륨 또는 크기 300GiB 미만의 CVS 볼륨을 지원하지 않습니다. Trident는 애플리케이션 구축을 더 쉽게 할 수 있도록 너무 작은 볼륨을 요청하는 경우 최소 크기의 볼륨을 자동으로 생성합니다.
+
+GCP에서 CVS를 사용하는 경우 이러한 기본 볼륨 옵션 설정을 사용할 수 있습니다.
+
+[cols="3*"]
+|===
+| 옵션을 선택합니다 | 설명 | 예 
+
+
+| `exportRule`  a| 
+NFS 액세스 목록(주소 및/또는 CIDR 서브넷)의 기본값은 "0.0.0.0/0"입니다.
+ a| 
+“10.0.1.0 / 24,10.0.2.100”
+
+
+
+| `snapshotDir`  a| 
+의 표시 여부를 제어합니다 `.snapshot` 디렉토리
+ a| 
+"거짓"
+
+
+
+| `snapshotReserve`  a| 
+스냅숏 예비 공간 비율, 기본값은 " "로, CVS 기본값을 0으로 적용합니다
+ a| 
+“10”
+
+
+
+| `size`  a| 
+볼륨 크기, 기본값: "100GiB"
+ a| 
+“10T”
+
+|===
+
+
+=== GCP 구성 파일의 예 CVS
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "gcp-cvs",
+    "projectNumber": "012345678901",
+    "apiRegion": "us-west2",
+    "apiKey": {
+        "type": "service_account",
+        "project_id": "my-gcp-project",
+        "private_key_id": "1234567890123456789012345678901234567890",
+        "private_key": "-----BEGIN PRIVATE KEY-----\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nznHczZsrrtHisIsAbOguSaPIKeyAZNchRAGzlzZE4jK3bl/qp8B4Kws8zX5ojY9m\nXsYg6gyxy4zq7OlwWgLwGa==\n-----END PRIVATE KEY-----\n",
+        "client_email": "cloudvolumes-admin-sa@my-gcp-project.iam.gserviceaccount.com",
+        "client_id": "123456789012345678901",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cloudvolumes-admin-sa%40my-gcp-project.iam.gserviceaccount.com"
+    },
+    "proxyURL": "http://proxy-server-hostname/"
+}
+----
+
+
+== Azure NetApp Files 구성
+
+를 구성하고 사용합니다 https://azure.microsoft.com/en-us/services/netapp/["Azure NetApp Files"^] 백엔드, 다음이 필요합니다.
+
+* `subscriptionID` Azure NetApp Files가 활성화된 Azure 구독에서
+* `tenantID`, `clientID`, 및 `clientSecret` 에서 https://docs.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal["앱 등록"^] Azure NetApp Files 서비스에 대한 충분한 권한이 있는 Azure Active Directory에서
+* 하나 이상의 Azure 위치가 있습니다 https://docs.microsoft.com/en-us/azure/azure-netapp-files/azure-netapp-files-delegate-subnet["위임된 서브넷"^]
+
+
+
+TIP: Azure NetApp Files를 처음 사용하거나 새 위치에서 사용하는 경우, 일부 초기 구성이 필요합니다 https://docs.microsoft.com/en-us/azure/azure-netapp-files/azure-netapp-files-quickstart-set-up-account-create-volumes?tabs=azure-portal["빠른 시작 가이드"^] 안내합니다.
+
+
+NOTE: Astra Trident 21.04.0 이전 버전에서는 수동 QoS 용량 풀을 지원하지 않습니다.
+
+[cols="3*"]
+|===
+| 옵션을 선택합니다 | 설명 | 기본값 
+
+
+| `version`  a| 
+항상 1
+ a| 
+
+
+
+| `storageDriverName`  a| 
+“Azure-NetApp-파일”
+ a| 
+
+
+
+| `backendName`  a| 
+스토리지 백엔드의 사용자 지정 이름입니다
+ a| 
+드라이버 이름 + “_” + 임의 문자
+
+
+
+| `subscriptionID`  a| 
+Azure 구독의 구독 ID입니다
+ a| 
+
+
+
+| `tenantID`  a| 
+앱 등록에서 테넌트 ID입니다
+ a| 
+
+
+
+| `clientID`  a| 
+앱 등록의 클라이언트 ID입니다
+ a| 
+
+
+
+| `clientSecret`  a| 
+앱 등록에서 클라이언트 암호
+ a| 
+
+
+
+| `serviceLevel`  a| 
+"표준", "프리미엄" 또는 "Ultra" 중 하나
+ a| 
+“”(임의)
+
+
+
+| `location`  a| 
+Azure 위치의 이름 에 새 볼륨이 생성됩니다
+ a| 
+“”(임의)
+
+
+
+| `virtualNetwork`  a| 
+위임된 서브넷이 있는 가상 네트워크의 이름입니다
+ a| 
+“”(임의)
+
+
+
+| `subnet`  a| 
+위임된 서브넷의 이름입니다 `Microsoft.Netapp/volumes`
+ a| 
+“”(임의)
+
+
+
+| `nfsMountOptions`  a| 
+NFS 마운트 옵션에 대한 세밀한 제어
+ a| 
+"-o nfsvers=3"
+
+
+
+| `limitVolumeSize`  a| 
+요청된 볼륨 크기가 이 값보다 큰 경우 용량 할당에 실패합니다
+ a| 
+“”(기본적으로 적용되지 않음)
+
+|===
+
+NOTE: Azure NetApp Files 서비스는 100GB 미만의 볼륨을 지원하지 않습니다. 보다 쉽게 애플리케이션을 배포할 수 있도록 작은 볼륨이 요청되는 경우 Trident가 자동으로 100GB 볼륨을 생성합니다.
+
+구성의 특수 섹션에서 이러한 옵션을 사용하여 각 볼륨이 기본적으로 프로비저닝되는 방식을 제어할 수 있습니다.
+
+[cols="3*"]
+|===
+| 옵션을 선택합니다 | 설명 | 기본값 
+
+
+| `exportRule`  a| 
+새 볼륨의 내보내기 규칙. CIDR 표기법을 사용하여 IPv4 주소 또는 IPv4 서브넷의 조합을 쉼표로 구분해야 합니다.
+ a| 
+“0.0.0.0/0”
+
+
+
+| `snapshotDir`  a| 
+의 표시 여부를 제어합니다 `.snapshot` 디렉토리
+ a| 
+"거짓"
+
+
+
+| `size`  a| 
+새 볼륨의 기본 크기입니다
+ a| 
+“100G”
+
+|===
+
+
+=== Azure NetApp Files 구성의 예
+
+* 예 1: Azure-NetApp-파일 * 에 대한 최소 백엔드 구성
+
+이는 절대적인 최소 백엔드 구성입니다. 이 구성을 통해 Trident는 전 세계 모든 위치에서 ANF에 위임된 모든 NetApp 계정, 용량 풀 및 서브넷을 검색하고 이 중 하나에 무작위로 새 볼륨을 배치합니다.
+
+이 구성은 ANF를 처음 사용해 보고 그러나 실제로, 용량 할당 볼륨에 대한 추가 범위를 제공하여 사용자가 원하는 특성을 갖고 있는지 확인하고 사용 중인 컴퓨팅에 가까운 네트워크에서 끝내고자 합니다. 자세한 내용은 다음 예제를 참조하십시오.
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "azure-netapp-files",
+    "subscriptionID": "9f87c765-4774-fake-ae98-a721add45451",
+    "tenantID": "68e4f836-edc1-fake-bff9-b2d865ee56cf",
+    "clientID": "dd043f63-bf8e-fake-8076-8de91e5713aa",
+    "clientSecret": "SECRET"
+}
+----
+* 예 2: Azure-NetApp-파일 * 에 대한 단일 위치 및 특정 서비스 수준
+
+이 백엔드 구성은 Azure의 "eastus" 위치에 볼륨을 "프리미엄" 용량 풀에 배치합니다. Trident는 해당 위치에서 ANF에 위임된 모든 서브넷을 자동으로 검색하여 그 중 하나에 무작위로 새 볼륨을 배치합니다.
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "azure-netapp-files",
+    "subscriptionID": "9f87c765-4774-fake-ae98-a721add45451",
+    "tenantID": "68e4f836-edc1-fake-bff9-b2d865ee56cf",
+    "clientID": "dd043f63-bf8e-fake-8076-8de91e5713aa",
+    "clientSecret": "SECRET",
+    "location": "eastus",
+    "serviceLevel": "Premium"
+}
+----
+* 예 3: Azure-NetApp-파일 * 에 대한 고급 구성
+
+이 백엔드 구성은 단일 서브넷에 대한 볼륨 배치 범위를 더욱 줄여주고 일부 볼륨 프로비저닝 기본값도 수정합니다.
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "azure-netapp-files",
+    "subscriptionID": "9f87c765-4774-fake-ae98-a721add45451",
+    "tenantID": "68e4f836-edc1-fake-bff9-b2d865ee56cf",
+    "clientID": "dd043f63-bf8e-fake-8076-8de91e5713aa",
+    "clientSecret": "SECRET",
+    "location": "eastus",
+    "serviceLevel": "Premium",
+    "virtualNetwork": "my-virtual-network",
+    "subnet": "my-subnet",
+    "nfsMountOptions": "nfsvers=3,proto=tcp,timeo=600",
+    "limitVolumeSize": "500Gi",
+    "defaults": {
+        "exportRule": "10.0.0.0/24,10.0.1.0/24,10.0.2.100",
+        "size": "200Gi"
+    }
+}
+----
+* 예 4: Azure-NetApp-파일 * 이 포함된 가상 스토리지 풀
+
+이 백엔드 구성은 여러 개를 정의합니다 link:../trident-concepts/virtual-storage-pool.html["스토리지 풀"^] 단일 파일. 다양한 서비스 수준을 지원하는 여러 용량 풀이 있고 이를 나타내는 Kubernetes의 스토리지 클래스를 생성하려는 경우에 유용합니다.
+
+이는 가상 스토리지 풀과 해당 레이블의 강력한 성능을 긁는 것입니다.
+
+[listing]
+----
+{
+    "version": 1,
+    "storageDriverName": "azure-netapp-files",
+    "subscriptionID": "9f87c765-4774-fake-ae98-a721add45451",
+    "tenantID": "68e4f836-edc1-fake-bff9-b2d865ee56cf",
+    "clientID": "dd043f63-bf8e-fake-8076-8de91e5713aa",
+    "clientSecret": "SECRET",
+    "nfsMountOptions": "nfsvers=3,proto=tcp,timeo=600",
+    "labels": {
+        "cloud": "azure"
+    },
+    "location": "eastus",
+
+    "storage": [
+        {
+            "labels": {
+                "performance": "gold"
+            },
+            "serviceLevel": "Ultra"
+        },
+        {
+            "labels": {
+                "performance": "silver"
+            },
+            "serviceLevel": "Premium"
+        },
+        {
+            "labels": {
+                "performance": "bronze"
+            },
+            "serviceLevel": "Standard",
+        }
+    ]
+}
+----

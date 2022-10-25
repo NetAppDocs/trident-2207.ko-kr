@@ -1,0 +1,16 @@
+---
+section: trident-concepts
+title: 개념
+entries:
+- title: Astra Trident에 대해 자세히 알아보십시오
+  url: "/trident-concepts/intro.html"
+- title: ONTAP 드라이버
+  url: "/trident-concepts/ontap-drivers.html"
+- title: 프로비저닝
+  url: "/trident-concepts/provisioning.html"
+- title: 볼륨 스냅숏
+  url: "/trident-concepts/snapshots.html"
+- title: 가상 스토리지 풀
+  url: "/trident-concepts/virtual-storage-pool.html"
+- title: 볼륨 액세스 그룹
+  url: "/trident-concepts/vol-access-groups.html"

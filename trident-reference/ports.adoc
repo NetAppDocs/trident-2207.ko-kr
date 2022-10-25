@@ -1,0 +1,36 @@
+---
+sidebar: sidebar 
+permalink: trident-reference/trident-ports.html 
+keywords: astra trident, port, ports 
+summary: Astra Trident가 통신하는 포트에 대해 자세히 알아보십시오. 
+---
+= Astra Trident 포트
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+Astra Trident가 통신하는 포트에 대해 자세히 알아보십시오.
+
+Astra Trident는 다음 포트를 통해 통신합니다.
+
+[cols="2,4"]
+|===
+| 포트 | 목적 
+
+
+| 8443 | 백채널 HTTPS 
+
+
+| 8001입니다 | Prometheus 메트릭 엔드포인트 
+
+
+| 8000 | Trident REST 서버 
+
+
+| 17546 | Trident 디포드에 사용되는 활성/준비 프로브 포트 
+|===
+
+NOTE: 을 사용하여 설치 시간 동안 활성/준비 프로브 포트를 변경할 수 있습니다 `--probe-port` 깃발. 이 포트가 작업자 노드의 다른 프로세스에서 사용되지 않도록 하는 것이 중요합니다.

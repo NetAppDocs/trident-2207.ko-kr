@@ -1,0 +1,309 @@
+---
+sidebar: sidebar 
+permalink: trident-reco/storage-config-best-practices.html 
+keywords: kubernetes, clusters, nodes, components, master, compute 
+summary: Kubernetes 클러스터는 일반적으로 두 가지 유형의 노드로 구성되며, 각 노드는 다양한 기능의 측면을 담당합니다. 
+---
+= 스토리지 구성
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+NetApp 포트폴리오의 각 스토리지 플랫폼은 컨테이너식으로 애플리케이션에 이점을 제공하는 고유한 기능을 제공합니다. Trident는 ONTAP 및 요소와 함께 작동합니다. 모든 애플리케이션과 시나리오에 적합한 플랫폼이 한 개 있는 것은 아니지만, 플랫폼을 선택할 때 애플리케이션과 장치를 관리하는 팀의 요구 사항을 고려해야 합니다.
+
+활용 중인 프로토콜을 사용하여 호스트 운영 체제의 기준 모범 사례를 따라야 합니다. 필요에 따라 특정 애플리케이션에 맞게 스토리지를 최적화할 수 있도록 백엔드, 스토리지 클래스 및 PVC 설정과 함께 사용 가능한 경우 애플리케이션 Best Practice를 통합하는 것을 고려할 수 있습니다.
+
+
+
+== ONTAP 및 Cloud Volumes ONTAP 모범 사례
+
+Trident를 위한 ONTAP 및 Cloud Volumes ONTAP를 구성하기 위한 모범 사례에 대해 알아보십시오.
+
+다음 권장 사항은 Trident에서 동적으로 프로비저닝되는 볼륨을 사용하는 컨테이너식 워크로드에 대한 ONTAP 구성 지침입니다. 각 항목을 고려하여 작업 환경의 적절성을 판단해야 합니다.
+
+
+
+=== Trident 전용 SVM을 사용하십시오
+
+SVM(스토리지 가상 시스템)은 ONTAP 시스템의 테넌트 간에 격리하고 관리를 제공합니다. SVM을 애플리케이션 전용으로 사용하면 권한을 위임하고 리소스 사용을 제한하는 모범 사례를 적용할 수 있습니다.
+
+SVM 관리를 위해 몇 가지 옵션을 사용할 수 있습니다.
+
+* 백엔드 구성에서 클러스터 관리 인터페이스를 적절한 자격 증명과 함께 제공하고 SVM 이름을 지정합니다.
+* ONTAP System Manager 또는 CLI를 사용하여 SVM을 위한 전용 관리 인터페이스를 생성합니다.
+* 관리 역할을 NFS 데이터 인터페이스와 공유합니다.
+
+
+각 경우 인터페이스가 DNS에 있어야 하며, Trident를 구성할 때 DNS 이름을 사용해야 합니다. 이렇게 하면 네트워크 ID 보존을 사용하지 않고 SVM-DR과 같은 일부 DR 시나리오를 간편하게 수행할 수 있습니다.
+
+SVM에 전용 또는 공유 관리 LIF를 사용하는 것이 더 이상 선호되지 않지만, 선택한 접근 방식에 맞게 네트워크 보안 정책을 조정해야 합니다. 관리 LIF는 DNS를 통해 액세스할 수 있어야 하며, 유연성을 극대화해야 합니다 https://docs.netapp.com/ontap-9/topic/com.netapp.doc.pow-dap/GUID-B9E36563-1C7A-48F5-A9FF-1578B99AADA9.html["SVM-DR"^] Trident와 함께 사용합니다.
+
+
+
+=== 최대 볼륨 수를 제한합니다
+
+ONTAP 스토리지 시스템의 최대 볼륨 수는 소프트웨어 버전과 하드웨어 플랫폼에 따라 다릅니다. 을 참조하십시오 https://hwu.netapp.com/["NetApp Hardware Universe를 참조하십시오"^] 정확한 제한을 결정하는 특정 플랫폼 및 ONTAP 버전. 볼륨 수가 소진되면 프로비저닝 작업이 Trident뿐 아니라 모든 스토리지 요청에 대해 실패합니다.
+
+Trident `ontap-nas` 및 `ontap-san` 드라이버는 만들어진 각 Kubernetes PV(영구 볼륨)에 대해 FlexVolume을 프로비저닝합니다. 를 클릭합니다 `ontap-nas-economy` 드라이버는 200개의 PVS에 대해 약 1개의 FlexVolume을 생성합니다(50에서 300까지 구성 가능). 를 클릭합니다 `ontap-san-economy` 드라이버는 100개의 PVS에 대해 약 1개의 FlexVolume을 생성합니다(50에서 200까지 구성 가능). Trident가 스토리지 시스템에서 사용 가능한 모든 볼륨을 사용하지 않도록 하려면 SVM에 제한을 설정해야 합니다. 이 작업은 명령줄에서 수행할 수 있습니다.
+
+[listing]
+----
+vserver modify -vserver <svm_name> -max-volumes <num_of_volumes>
+----
+의 값 `max-volumes` 환경에 따라 몇 가지 기준에 따라 다름:
+
+* ONTAP 클러스터에 있는 기존 볼륨의 수입니다
+* 다른 애플리케이션에 대해 Trident 외부에 프로비저닝할 것으로 예상되는 볼륨 수입니다
+* Kubernetes 애플리케이션에서 사용할 것으로 예상되는 영구 볼륨의 수입니다
+
+
+를 클릭합니다 `max-volumes` value는 개별 ONTAP 노드가 아닌 ONTAP 클러스터의 모든 노드에 프로비저닝된 총 볼륨입니다. 결과적으로, ONTAP 클러스터 노드에 다른 노드보다 훨씬 더 많은 Trident 프로비저닝 볼륨이 있을 수 있는 몇 가지 조건이 발생할 수 있습니다.
+
+예를 들어, 2노드 ONTAP 클러스터에는 최대 2000개의 FlexVolumes를 호스팅할 수 있는 기능이 있습니다. 최대 볼륨 수를 1250으로 설정하면 매우 적절합니다. 그러나, 단 인 경우 https://library.netapp.com/ecmdocs/ECMP1368859/html/GUID-3AC7685D-B150-4C1F-A408-5ECEB3FF0011.html["애그리게이트"^] 한 노드에서 SVM에 할당하거나, 한 노드에서 할당된 애그리게이트는 용량 등으로 인해 프로비저닝할 수 없는 경우, 다른 노드는 프로비저닝된 모든 Trident 볼륨의 타겟이 됩니다. 즉, 보다 먼저 해당 노드에 대한 볼륨 제한에 도달할 수 있습니다 `max-volumes` 값에 도달하면 Trident와 해당 노드를 사용하는 기타 볼륨 작업에 모두 영향을 미칩니다. * 클러스터의 각 노드에서 애그리게이트가 동일한 수의 Trident가 사용하는 SVM에 할당되도록 하면 이러한 상황을 방지할 수 있습니다. *
+
+
+
+=== Trident에서 생성한 볼륨의 최대 크기를 제한합니다
+
+Trident에서 생성할 수 있는 볼륨의 최대 크기를 구성하려면 를 사용합니다 `limitVolumeSize` 매개 변수 을 선택합니다 `backend.json` 정의.
+
+스토리지 어레이에서 볼륨 크기를 제어하는 것 외에도 Kubernetes 기능을 활용해야 합니다.
+
+
+
+=== 양방향 CHAP를 사용하도록 Trident를 구성합니다
+
+백엔드 정의에 CHAP 이니시에이터와 타겟 사용자 이름 및 암호를 지정하고 SVM에서 Trident가 CHAP를 사용하도록 설정할 수 있습니다. 를 사용합니다 `useCHAP` 매개 변수 백엔드 구성에서 Trident는 CHAP를 사용하여 ONTAP 백엔드에 대한 iSCSI 연결을 인증합니다. 양방향 CHAP 지원은 Trident 20.04 이상에서 사용할 수 있습니다.
+
+
+
+=== SVM QoS 정책을 생성하고 사용합니다
+
+SVM에 적용되는 ONTAP QoS 정책을 활용하여 Trident에서 프로비저닝된 볼륨에서 사용할 수 있는 IOPS 수를 제한합니다. 그러면 에 도움이 됩니다 http://docs.netapp.com/ontap-9/topic/com.netapp.doc.pow-perf-mon/GUID-77DF9BAF-4ED7-43F6-AECE-95DFB0680D2F.html?cp=7_1_2_1_2["괴롭힘을 방지합니다"^] 또는 Trident SVM 외부의 워크로드에 영향을 주지 않는 제어 컨테이너
+
+몇 가지 단계로 SVM에 대한 QoS 정책을 생성할 수 있습니다. 가장 정확한 정보는 사용 중인 ONTAP 버전 설명서를 참조하십시오. 아래 예는 SVM에 사용 가능한 총 IOPS를 5000으로 제한하는 QoS 정책을 생성합니다.
+
+[listing]
+----
+# create the policy group for the SVM
+qos policy-group create -policy-group <policy_name> -vserver <svm_name> -max-throughput 5000iops
+
+# assign the policy group to the SVM, note this will not work
+# if volumes or files in the SVM have existing QoS policies
+vserver modify -vserver <svm_name> -qos-policy-group <policy_name>
+----
+또한 사용하는 ONTAP 버전에서 지원하는 경우에는 최소 QoS를 사용하여 컨테이너화된 워크로드에 대한 처리량을 보장하는 것을 고려할 수 있습니다. 적응형 QoS는 SVM 레벨 정책과 호환되지 않습니다.
+
+컨테이너화된 워크로드 전용 IOPS 수는 다양한 측면에 따라 다릅니다. 그 밖의 다른 사항으로는 다음과 같은 것들이 있습니다.
+
+* 기타 워크로드는 스토리지 어레이를 사용합니다. 스토리지 리소스를 활용하여 Kubernetes 구축과 관련되지 않은 다른 워크로드가 있는 경우, 해당 워크로드가 실수로 영향을 받지 않도록 주의해야 합니다.
+* 컨테이너에서 실행 중인 예상 워크로드 IOPS 요구사항이 높은 워크로드를 컨테이너에서 실행할 경우 QoS 정책이 낮으면 잘못된 경험이 될 수 있습니다.
+
+
+SVM 레벨에서 할당된 QoS 정책을 사용하면 동일한 IOPS 풀을 공유하는 SVM에 프로비저닝된 모든 볼륨이 생성된다는 점을 기억해야 합니다. 컨테이너화된 애플리케이션 중 하나 또는 그 수가 적은 경우 높은 IOPS 요구사항이 있으면 다른 컨테이너화된 워크로드에 문제가 될 수 있습니다. 이 경우 외부 자동화를 사용하여 볼륨당 QoS 정책을 할당하는 것을 고려할 수 있습니다.
+
+
+IMPORTANT: ONTAP 버전이 9.8 이전인 경우 SVM * 에만 QoS 정책 그룹을 할당해야 합니다.
+
+
+
+=== Trident에 대한 QoS 정책 그룹을 생성합니다
+
+QoS(서비스 품질)는 경쟁 워크로드로부터 주요 워크로드의 성능이 저하되지 않도록 보장합니다. ONTAP QoS 정책 그룹은 볼륨에 대한 QoS 옵션을 제공하고 사용자가 하나 이상의 워크로드에 대한 처리량 한도를 정의할 수 있도록 지원합니다. QoS에 대한 자세한 내용은 를 참조하십시오 https://docs.netapp.com/ontap-9/topic/com.netapp.doc.pow-perf-mon/GUID-77DF9BAF-4ED7-43F6-AECE-95DFB0680D2F.html["QoS를 통해 처리량 보장"^]. 백엔드에서 또는 스토리지 풀에 QoS 정책 그룹을 지정할 수 있으며, 이러한 그룹은 해당 풀 또는 백엔드에서 생성된 각 볼륨에 적용됩니다.
+
+ONTAP에는 기존 QoS 정책과 적응형 서비스 두 가지 QoS 정책 그룹이 있습니다. 기존 정책 그룹은 IOPS 단위로 최대 또는 최소 단위의 고정 처리량을 제공합니다. 적응형 QoS는 워크로드 크기에 따라 처리량을 자동으로 확장하므로 워크로드 크기에 따라 IOPS와 TB|GB의 비율을 유지합니다. 따라서 대규모 구축 환경에서 수백 또는 수천 개의 워크로드를 관리할 경우 상당한 이점이 있습니다.
+
+QoS 정책 그룹을 생성할 때는 다음 사항을 고려하십시오.
+
+* 를 설정해야 합니다 `qosPolicy` 키를 누릅니다 `defaults` 백엔드 구성의 블록 다음 백엔드 구성 예를 참조하십시오.
+
+
+[listing]
+----
+  {
+    "version": 1,
+    "storageDriverName": "ontap-nas",
+    "managementLIF": "0.0.0.0",
+    "dataLIF": "0.0.0.0",
+    "svm": "svm0",
+    "username": "user",
+    "password": "pass",
+    "defaults": {
+      "qosPolicy": "standard-pg"
+    },
+    "storage": [
+      {
+        "labels": {"performance": "extreme"},
+        "defaults": {
+          "adaptiveQosPolicy": "extremely-adaptive-pg"
+        }
+      },
+      {
+        "labels": {"performance": "premium"},
+        "defaults": {
+          "qosPolicy": "premium-pg"
+        }
+      }
+    ]
+  }
+----
+* 각 볼륨이 정책 그룹에서 지정한 전체 처리량을 얻을 수 있도록 볼륨별로 정책 그룹을 적용해야 합니다. 공유 정책 그룹은 지원되지 않습니다.
+
+
+QoS 정책 그룹에 대한 자세한 내용은 을 참조하십시오 https://docs.netapp.com/ontap-9/topic/com.netapp.doc.dot-cm-cmpr-980/TOC__qos.html["ONTAP 9.8 QoS 명령"^].
+
+
+
+=== 스토리지 리소스에 대한 액세스 권한을 Kubernetes 클러스터 구성원으로 제한합니다
+
+Trident에서 생성한 NFS 볼륨 및 iSCSI LUN에 대한 액세스를 제한하는 것은 Kubernetes 구축을 위한 보안 환경의 중요한 구성요소입니다. 이렇게 하면 Kubernetes 클러스터의 일부가 아닌 호스트가 볼륨에 액세스하고 예기치 않게 데이터를 수정하는 것을 방지할 수 있습니다.
+
+네임스페이스가 Kubernetes의 리소스에 대한 논리적 경계라는 것을 이해하는 것이 중요합니다. 동일한 네임스페이스의 리소스를 공유할 수 있다고 가정하지만, 특히 상호 네임스페이스 기능이 없다는 것이 중요합니다. 즉, PVS는 글로벌 객체이지만 PVC에 바인딩되면 동일한 네임스페이스에 있는 Pod에서만 액세스할 수 있습니다. * 적절한 경우 네임스페이스를 사용하여 구분을 제공하는 것이 중요합니다. *
+
+Kubernetes 컨텍스트에서 데이터 보안과 관련하여 대부분의 조직은 컨테이너 내의 프로세스가 호스트에 마운트된 스토리지에 액세스할 수 있지만 컨테이너용 프로세스는 아닙니다.  https://en.wikipedia.org/wiki/Linux_namespaces["네임스페이스"^] 이러한 유형의 손상을 방지하도록 설계되었습니다. 그러나 권한 있는 컨테이너에는 한 가지 예외가 있습니다.
+
+권한 있는 컨테이너는 일반적인 것보다 훨씬 더 많은 호스트 수준 권한으로 실행되는 컨테이너입니다. 이러한 기능은 기본적으로 거부되지 않으므로 을 사용하여 기능을 사용하지 않도록 설정해야 합니다 https://kubernetes.io/docs/concepts/policy/pod-security-policy/["POD 보안 정책"^].
+
+Kubernetes 및 외부 호스트 모두에서 액세스가 필요한 볼륨의 경우, Trident에서 관리하지 않고 관리자가 PV를 도입한 상태로 스토리지를 기존 방식으로 관리해야 합니다. 이렇게 하면 Kubernetes 및 외부 호스트의 연결이 모두 끊기고 볼륨을 더 이상 사용하지 않는 경우에만 스토리지 볼륨이 폐기됩니다. 또한, 맞춤형 엑스포트 정책을 적용하여 Kubernetes 클러스터 노드 및 Kubernetes 클러스터 외부의 타겟 서버에서 액세스할 수 있습니다.
+
+전용 인프라 노드(예: OpenShift) 또는 사용자 애플리케이션을 위해 스케줄링할 수 없는 다른 노드가 있는 배포의 경우 별도의 엑스포트 정책을 사용하여 스토리지 리소스에 대한 액세스를 더욱 제한해야 합니다. 여기에는 해당 인프라 노드에 배포된 서비스(예: OpenShift Metrics 및 Logging 서비스)에 대한 엑스포트 정책과 비인프라 노드에 배포되는 표준 애플리케이션이 포함됩니다.
+
+
+
+=== 전용 엑스포트 정책을 사용하십시오
+
+Kubernetes 클러스터에 있는 노드에만 액세스할 수 있도록 각 백엔드에 대한 엑스포트 정책이 있어야 합니다. Trident는 20.04 릴리스부터 내보내기 정책을 자동으로 생성하고 관리할 수 있습니다. 이러한 방법으로 Trident는 Kubernetes 클러스터의 노드에 프로비저닝되는 볼륨에 대한 액세스를 제한하고 노드 추가/삭제를 단순화합니다.
+
+또는 수동으로 엑스포트 정책을 생성하여 각 노드 액세스 요청을 처리하는 하나 이상의 엑스포트 규칙으로 채울 수도 있습니다.
+
+* 를 사용합니다 `vserver export-policy create` ONTAP CLI 명령을 사용하여 엑스포트 정책을 생성합니다.
+* 를 사용하여 엑스포트 정책에 규칙을 추가합니다 `vserver export-policy rule create` ONTAP CLI 명령
+
+
+이러한 명령을 실행하면 데이터에 액세스할 수 있는 Kubernetes 노드를 제한할 수 있습니다.
+
+
+
+=== SVM 애플리케이션 쇼마운트를 해제합니다
+
+를 클릭합니다 `showmount` 기능을 사용하면 NFS 클라이언트가 SVM에서 사용 가능한 NFS 엑스포트 목록을 쿼리할 수 있습니다. Kubernetes 클러스터에 구축된 POD에서 를 실행할 수 있습니다 `showmount -e` 데이터 LIF에 대한 명령을 실행하면 액세스 권한이 없는 마운트를 비롯하여 사용 가능한 마운트의 목록이 표시됩니다. 이는 그 자체로 보안 문제가 아니라, 권한이 없는 사용자가 NFS 내보내기에 연결하는 데 도움이 될 수 있는 불필요한 정보를 제공합니다.
+
+를 비활성화해야 합니다 `showmount` SVM 레벨의 ONTAP CLI 명령을 사용하여 다음을 수행합니다.
+
+[listing]
+----
+vserver nfs modify -vserver <svm_name> -showmount disabled
+----
+
+
+== SolidFire 모범 사례
+
+Trident를 위한 SolidFire 스토리지를 구성하기 위한 모범 사례에 대해 알아보십시오.
+
+
+
+=== SolidFire 계정을 만듭니다
+
+각 SolidFire 계정은 고유한 볼륨 소유자를 나타내며 자체 CHAP(Challenge-Handshake 인증 프로토콜) 자격 증명을 받습니다. 계정 이름 및 상대 CHAP 자격 증명을 사용하거나 볼륨 액세스 그룹을 통해 계정에 할당된 볼륨에 액세스할 수 있습니다. 계정에는 최대 2천 개의 볼륨이 할당될 수 있지만 볼륨은 하나의 계정에만 속할 수 있습니다.
+
+
+
+=== QoS 정책을 생성합니다
+
+여러 볼륨에 적용할 수 있는 표준화된 서비스 품질 설정을 만들어 저장하려면 SolidFire 서비스 품질(QoS) 정책을 사용하십시오.
+
+볼륨별로 QoS 매개 변수를 설정할 수 있습니다. QoS를 정의하는 세 가지 구성 가능한 매개 변수, 즉 Min IOPS, Max IOPS, Burst IOPS를 설정하여 각 볼륨의 성능을 보장할 수 있습니다.
+
+4KB 블록 크기에 대해 가능한 최소, 최대 및 버스트 IOPS 값입니다.
+
+[cols="5*"]
+|===
+| IOPS 매개 변수입니다 | 정의 | 최소 값 | 기본값 | 최대 가치(4KB) 
+
+
+ a| 
+최소 IOPS
+ a| 
+볼륨에 대한 보장된 성능 수준.
+| 50  a| 
+50
+ a| 
+15000
+
+
+
+ a| 
+최대 IOPS
+ a| 
+성능은 이 제한을 초과하지 않습니다.
+| 50  a| 
+15000
+ a| 
+200,000
+
+
+
+ a| 
+버스트 IOPS
+ a| 
+짧은 버스트 시나리오에서 허용되는 최대 IOPS입니다.
+| 50  a| 
+15000
+ a| 
+200,000
+
+|===
+
+NOTE: 최대 IOPS와 버스트 IOPS는 최대 200,000으로 설정할 수 있지만, 실제 볼륨의 최대 성능은 클러스터 사용량 및 노드당 성능에 의해 제한됩니다.
+
+블록 크기와 대역폭은 IOPS 수에 직접적인 영향을 미칩니다. 블록 크기가 증가함에 따라 시스템에서 더 큰 블록 크기를 처리하는 데 필요한 수준까지 대역폭을 높일 수 있습니다. 대역폭이 증가할수록 시스템에서 달성할 수 있는 IOPS의 수가 감소합니다. 을 참조하십시오 https://www.netapp.com/pdf.html?item=/media/10502-tr-4644pdf.pdf["SolidFire 서비스 품질"^] QoS 및 성능에 대한 자세한 내용은 를 참조하십시오.
+
+
+
+=== SolidFire 인증
+
+요소는 CHAP 및 vag(볼륨 액세스 그룹)의 두 가지 인증 방법을 지원합니다. CHAP는 CHAP 프로토콜을 사용하여 호스트를 백엔드에 인증합니다. 볼륨 액세스 그룹은 프로비전되는 볼륨에 대한 액세스를 제어합니다. NetApp은 CHAP를 사용하여 인증을 수행하는 것이 더 간단하고 확장 제한이 없기 때문에 CHAP를 사용하는 것이 좋습니다.
+
+
+NOTE: CSI 프로비저닝이 강화된 Trident는 CHAP 인증 사용을 지원합니다. VAG는 일반적인 비 CSI 작동 모드에서만 사용해야 합니다.
+
+CHAP 인증(이니시에이터가 대상 볼륨 사용자인지 확인)은 계정 기반 액세스 제어에서만 지원됩니다. CHAP를 인증에 사용하는 경우 단방향 CHAP 및 양방향 CHAP의 두 가지 옵션을 사용할 수 있습니다. 단방향 CHAP는 SolidFire 계정 이름 및 이니시에이터 암호를 사용하여 볼륨 액세스를 인증합니다. 양방향 CHAP 옵션은 볼륨이 계정 이름과 이니시에이터 암호를 통해 호스트를 인증한 다음 호스트가 계정 이름과 타겟 암호를 통해 볼륨을 인증하기 때문에 볼륨을 인증하는 가장 안전한 방법을 제공합니다.
+
+그러나 CHAP를 설정할 수 없고 VAG가 필요한 경우 액세스 그룹을 생성하고 호스트 이니시에이터 및 볼륨을 액세스 그룹에 추가합니다. 액세스 그룹에 추가하는 각 IQN은 CHAP 인증을 사용하거나 사용하지 않고 그룹의 각 볼륨에 액세스할 수 있습니다. iSCSI 이니시에이터가 CHAP 인증을 사용하도록 구성된 경우 계정 기반 액세스 제어가 사용됩니다. iSCSI 초기자가 CHAP 인증을 사용하도록 구성되지 않은 경우 볼륨 액세스 그룹 액세스 제어가 사용됩니다.
+
+
+
+== 자세한 정보는 어디서 찾을 수 있습니까?
+
+다음은 몇 가지 모범 사례 문서입니다. 를 검색합니다 https://www.netapp.com/search/["NetApp 라이브러리"^] 최신 버전의 경우.
+
+* ONTAP *
+
+* https://www.netapp.com/us/media/tr-4067.pdf["NFS Best Practice and Implementation Guide를 참조하십시오"^]
+* http://docs.netapp.com/ontap-9/topic/com.netapp.doc.dot-cm-sanag/home.html["SAN 관리 가이드를 참조하십시오"^] (iSCSI의 경우)
+* http://docs.netapp.com/ontap-9/topic/com.netapp.doc.exp-iscsi-rhel-cg/home.html["RHEL용 iSCSI Express 구성"^]
+
+
+Element 소프트웨어 *
+
+* https://www.netapp.com/pdf.html?item=/media/10507-tr4639pdf.pdf["Linux용 SolidFire 구성"^]
+
+
+* NetApp HCI *
+
+* https://docs.netapp.com/us-en/hci/docs/hci_prereqs_overview.html["NetApp HCI 구축 사전 요구 사항"^]
+* https://docs.netapp.com/us-en/hci/docs/concept_nde_access_overview.html["NetApp 배포 엔진에 액세스합니다"^]
+
+
+* 응용 프로그램 모범 사례 정보 *
+
+* https://www.netapp.com/us/media/tr-4722.pdf["ONTAP 기반 MySQL의 모범 사례"^]
+* https://www.netapp.com/pdf.html?item=/media/10510-tr-4605.pdf["SolidFire 기반 MySQL의 모범 사례"^]
+* http://www.netapp.com/us/media/tr-4635.pdf["NetApp SolidFire 및 Cassandra"^]
+* http://www.netapp.com/us/media/tr-4606.pdf["SolidFire에 대한 Oracle 모범 사례"^]
+* http://www.netapp.com/us/media/tr-4610.pdf["SolidFire에 대한 PostgreSQL Best Practice"^]
+
+
+모든 애플리케이션에 구체적인 지침이 있는 것은 아니며 NetApp 팀과 함께 을 사용하는 것이 중요합니다 https://www.netapp.com/search/["NetApp 라이브러리"^] 최신 설명서를 참조하십시오.

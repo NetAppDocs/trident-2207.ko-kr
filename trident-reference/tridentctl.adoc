@@ -1,0 +1,266 @@
+---
+sidebar: sidebar 
+permalink: trident-reference/tridentctl.html 
+keywords: tridentctl, trident, kubernetes, commands, options, usage, flags 
+summary: Trident에 대한 간단한 액세스를 제공하는 명령줄 유틸리티인 tridentctl 에 대해 자세히 알아보십시오. 
+---
+= tridentctl 명령 및 옵션
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+[role="lead"]
+를 클릭합니다 https://github.com/NetApp/trident/releases["Trident 설치 프로그램 번들"^] 명령줄 유틸리티, `tridentctl`Astra Trident에 간편하게 액세스할 수 있습니다. 충분한 권한을 가진 Kubernetes 사용자는 이를 사용하여 Astra Trident를 설치할 뿐 아니라 직접 상호 작용하여 Astra Trident Pod가 포함된 네임스페이스를 관리할 수 있습니다.
+
+사용 정보를 보려면 를 실행합니다 `tridentctl --help`.
+
+사용 가능한 명령 및 전역 옵션은 다음과 같습니다.
+
+[listing]
+----
+Usage:
+  tridentctl [command]
+----
+사용 가능한 명령:
+
+* `create`Astra Trident에 리소스를 추가합니다.
+* `delete`Astra Trident에서 하나 이상의 리소스를 제거합니다.
+* `get`Astra Trident에서 하나 이상의 리소스를 제공합니다.
+* `help`: 명령에 대한 도움말입니다.
+* `images`Astra Trident에 필요한 컨테이너 이미지 테이블을 인쇄합니다.
+* `import`Astra Trident로 기존 리소스를 가져옵니다.
+* `install`Astra Trident를 설치합니다.
+* `logs`Astra Trident에서 로그를 인쇄합니다.
+* `send`Astra Trident에서 리소스를 보냅니다.
+* `uninstall`Astra Trident를 제거합니다.
+* `update`Astra Trident에서 리소스를 수정합니다.
+* `upgrade`: Astra Trident에서 리소스를 업그레이드합니다.
+* `version`Astra Trident의 버전을 인쇄하십시오.
+
+
+플래그:
+
+* ``-d, --debug`: 출력 디버그.
+* ``-h, --help`도움말을 참조하십시오 `tridentctl`.
+* ``-n, --namespace string`: Astra Trident 배포의 네임스페이스입니다.
+* ``-o, --output string`출력 형식. json|YAML|name|wide|ps(기본값) 중 하나.
+* ``-s, --server string`: Astra Trident REST 인터페이스의 주소/포트입니다.
++
+
+CAUTION: Trident REST 인터페이스는 127.0.0.1(IPv4의 경우) 또는 [::1](IPv6의 경우)에서만 수신 및 서비스하도록 구성할 수 있습니다.
+
+
+
+
+CAUTION: Trident REST 인터페이스는 127.0.0.1(IPv4의 경우) 또는 [::1](IPv6의 경우)에서만 수신 및 서비스하도록 구성할 수 있습니다.
+
+
+
+== 생성
+
+를 실행할 수 있습니다 `create` Astra Trident에 리소스를 추가하는 명령입니다.
+
+[listing]
+----
+Usage:
+  tridentctl create [option]
+----
+사용 가능한 옵션:
+`backend`Astra Trident에 백엔드를 추가합니다.
+
+
+
+== 삭제
+
+를 실행할 수 있습니다 `delete` Astra Trident에서 하나 이상의 리소스를 제거하는 명령입니다.
+
+[listing]
+----
+Usage:
+  tridentctl delete [option]
+----
+사용 가능한 옵션:
+
+* `backend`Astra Trident에서 하나 이상의 스토리지 백엔드를 삭제합니다.
+* `snapshot`Astra Trident에서 하나 이상의 볼륨 스냅샷을 삭제합니다.
+* `storageclass`Astra Trident에서 하나 이상의 스토리지 클래스를 삭제합니다.
+* `volume`Astra Trident에서 하나 이상의 스토리지 볼륨을 삭제합니다.
+
+
+
+
+== 가져오기
+
+를 실행할 수 있습니다 `get` Astra Trident에서 하나 이상의 리소스를 제공하는 명령입니다.
+
+[listing]
+----
+Usage:
+  tridentctl get [option]
+----
+사용 가능한 옵션:
+
+* `backend`Astra Trident에서 하나 이상의 스토리지 백엔드를 받으세요.
+* `snapshot`: Astra Trident에서 하나 이상의 스냅샷을 가져옵니다.
+* `storageclass`Astra Trident에서 하나 이상의 스토리지 클래스를 다운로드하십시오.
+* `volume`Astra Trident에서 하나 이상의 볼륨을 가져오십시오.
+
+
+
+
+== 이미지
+
+를 실행할 수 있습니다 `images` Astra Trident에 필요한 컨테이너 이미지 테이블을 인쇄하려면 플래그를 지정합니다.
+
+[listing]
+----
+Usage:
+  tridentctl images [flags]
+----
+플래그: * ``-h, --help`: Help for images.
+* ``-v, - -k8s -version string ': Kubernetes 클러스터의 의미 있는 버전
+
+
+
+== 볼륨 가져오기
+
+를 실행할 수 있습니다 `import volume` 기존 볼륨을 Astra Trident로 가져오는 명령입니다.
+
+[listing]
+----
+Usage:
+  tridentctl import volume <backendName> <volumeName> [flags]
+----
+별칭:
+`volume, v`
+
+플래그:
+
+* ``-f, --filename string`YAML 또는 JSON PVC 파일로 이동합니다.
+* ``-h, --help`: 볼륨에 대한 도움말입니다.
+* ``--no-manage`:PV/PVC만 생성 볼륨 라이프사이클 관리를 가정하지 마십시오.
+
+
+
+
+== 설치합니다
+
+를 실행할 수 있습니다 `install` Astra Trident를 설치하는 플래그입니다.
+
+[listing]
+----
+Usage:
+  tridentctl install [flags]
+----
+플래그:
+
+* ``--autosupport-image string`: AutoSupport 원격 측정(기본값: "NetApp/트리덴트 자동 지원: 20.07.0")의 컨테이너 이미지입니다.
+* ``--autosupport-proxy string`: AutoSupport 텔레메트리 전송을 위한 프록시의 주소/포트입니다.
+* ``--csi`CSI Trident 설치(Kubernetes 1.13에만 재정의, 기능 게이트 필요)
+* ``--enable-node-prep`: 노드에 필요한 패키지 설치를 시도합니다.
+* ``--generate-custom-yaml`: 아무 것도 설치하지 않고 YAML 파일을 생성합니다.
+* ``-h, --help`: 설치 도움말.
+* ``--http-request-timeout`: Trident 컨트롤러의 REST API에 대한 HTTP 요청 시간 초과를 재정의합니다(기본값 1m30s).
+* ``--image-registry string`: 내부 이미지 레지스트리의 주소/포트입니다.
+* ``--k8s-timeout duration`모든 Kubernetes 작업(기본값 3m0의)의 시간 초과.
+* ``--kubelet-dir string`: kubelet의 내부 상태(기본값 "/var/lib/kubelet")의 호스트 위치입니다.
+* ``--log-format string`Astra Trident 로깅 형식(text, json)(기본 "text").
+* ``--pv string`Astra Trident에서 사용하는 레거시 PV의 이름입니다. 이 이름이 존재하지 않는지 확인합니다(기본 "삼중류").
+* ``--pvc string`Astra Trident에서 사용하는 기존 PVC의 이름입니다. 이 이름이 존재하지 않는지 확인합니다(기본 "삼중류").
+* ``--silence-autosupport`AutoSupport 번들을 NetApp에 자동으로 보내지 않습니다(기본값: true).
+* ``--silent`: 설치하는 동안 대부분의 출력을 비활성화합니다.
+* ``--trident-image string`: 설치할 Astra Trident 이미지.
+* ``--use-custom-yaml`설정 디렉토리에 있는 기존 YAML 파일을 사용합니다.
+* ``--use-ipv6`: Astra Trident의 통신에는 IPv6를 사용합니다.
+
+
+
+
+== 로그
+
+를 실행할 수 있습니다 `logs` Astra Trident의 로그를 인쇄할 플래그입니다.
+
+[listing]
+----
+Usage:
+  tridentctl logs [flags]
+----
+플래그:
+
+* ``-a, --archive`: 별도로 지정하지 않는 한 모든 로그를 사용하여 지원 아카이브를 생성합니다.
+* ``-h, --help`: 로그 도움말.
+* ``-l, --log string`: 표시할 Astra Trident 로그. 트리덴트|auto|트리덴트-operator|all 중 하나(기본 "자동").
+* ``--node string`노드 POD 로그를 수집할 Kubernetes 노드 이름입니다.
+* ``-p, --previous`: 이전 컨테이너 인스턴스에 대한 로그가 있으면 가져옵니다.
+* ``--sidecars`: 사이드카 컨테이너의 로그를 가져옵니다.
+
+
+
+
+== 전송
+
+를 실행할 수 있습니다 `send` Astra Trident에서 리소스를 보내는 명령입니다.
+
+[listing]
+----
+Usage:
+  tridentctl send [option]
+----
+사용 가능한 옵션:
+`autosupport`AutoSupport 아카이브를 NetApp으로 전송합니다.
+
+
+
+== 설치 제거
+
+를 실행할 수 있습니다 `uninstall` Astra Trident를 제거하는 플래그입니다.
+
+[listing]
+----
+Usage:
+  tridentctl uninstall [flags]
+----
+플래그: * `-h, --help`: 제거 도움말입니다. * `--silent`: 제거 중 대부분의 출력을 비활성화합니다.
+
+
+
+== 업데이트
+
+를 실행할 수 있습니다 `update` Astra Trident에서 리소스를 수정하는 명령입니다.
+
+[listing]
+----
+Usage:
+  tridentctl update [option]
+----
+사용 가능한 옵션:
+`backend`Astra Trident에서 백엔드를 업데이트합니다.
+
+
+
+== 업그레이드
+
+를 실행할 수 있습니다 `upgrade` Astra Trident에서 리소스를 업그레이드하는 명령입니다.
+
+[listing]
+----
+Usage:
+tridentctl upgrade [option]
+----
+사용 가능한 옵션:
+`volume`: NFS/iSCSI에서 CSI로 하나 이상의 영구 볼륨을 업그레이드합니다.
+
+
+
+== 버전
+
+를 실행할 수 있습니다 `version` 플래그를 사용하여 의 버전을 인쇄합니다 `tridentctl` 및 실행 중인 Trident 서비스를 제공합니다.
+
+[listing]
+----
+Usage:
+  tridentctl version [flags]
+----
+플래그: * `--client`: 클라이언트 버전만(서버가 필요하지 않음). * `-h, --help`: 버전에 대한 도움말입니다.

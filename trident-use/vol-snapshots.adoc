@@ -1,0 +1,203 @@
+---
+sidebar: sidebar 
+permalink: trident-use/vol-snapshots.html 
+keywords: volumes, on-demand volume snapshots, create snapshots, backends, kubernetes, create PVCs, PVCs 
+summary: 'Astra Trident의 20.01 릴리즈부터 Kubernetes 계층에서 PVS(영구 볼륨)의 스냅샷을 생성할 수 있습니다. 이러한 스냅샷을 사용하여 Astra Trident에서 생성한 볼륨의 시점 복사본을 유지하고 추가 볼륨(클론) 생성을 예약할 수 있습니다.' 
+---
+= 스냅샷 작업
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+Astra Trident의 20.01 릴리즈부터 Kubernetes 계층에서 PVS의 스냅샷을 생성할 수 있습니다. 이러한 스냅샷을 사용하여 Astra Trident에서 생성한 볼륨의 시점 복사본을 유지하고 추가 볼륨(클론) 생성을 예약할 수 있습니다. 볼륨 스냅샷은 에서 지원됩니다 `ontap-nas`, `ontap-san`, `ontap-san-economy`, `solidfire-san`, `gcp-cvs`, 및 `azure-netapp-files` 드라이버.
+
+
+NOTE: 이 기능은 Kubernetes 1.17(베타)에서 사용할 수 있으며 1.20에서 GA됩니다. 베타 버전에서 GA로 전환하는 데 따른 변경 사항을 이해하려면 를 참조하십시오 https://kubernetes.io/blog/2020/12/10/kubernetes-1.20-volume-snapshot-moves-to-ga/["릴리스 블로그"^]. GA로 졸업하면, 가 `v1` API 버전이 도입되었으며 와 이전 버전과 호환됩니다 `v1beta1` 스냅샷 수.
+
+.무엇을 &#8217;필요로 할거야
+* 볼륨 스냅숏을 생성하려면 외부 스냅샷 컨트롤러와 사용자 지정 리소스 정의(CRD)를 만들어야 합니다. 사용 중인 Kubernetes Orchestrator는 이 책임이 있습니다(예: Kubeadm, GKE, OpenShift).
+
+
+Kubernetes 배포 시 스냅샷 컨트롤러와 CRD가 포함되지 않은 경우 다음과 같이 배포할 수 있습니다.
+
+. 볼륨 스냅샷 CRD를 생성합니다.
++
+Kubernetes 1.20 이상의 경우 v5.0 이상의 스냅샷 구성 요소와 함께 v1 스냅샷 CRD를 사용하십시오. Kubernetes 1.19의 경우 v3.0.3 스냅샷 구성 요소와 함께 v1beta1을 사용합니다.
+
++
+[role="tabbed-block"]
+====
+.v5.0 구성 요소
+--
+[listing]
+----
+cat snapshot-setup.sh
+#!/bin/bash
+# Create volume snapshot CRDs
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-5.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-5.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-5.0/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
+----
+--
+.v3.0.3 구성 요소
+--
+[listing]
+----
+cat snapshot-setup.sh
+#!/bin/bash
+# Create volume snapshot CRDs
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v3.0.3/client/config/crd/snapshot.storage.k8s.io_volumesnapshotclasses.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v3.0.3/client/config/crd/snapshot.storage.k8s.io_volumesnapshotcontents.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v3.0.3/client/config/crd/snapshot.storage.k8s.io_volumesnapshots.yaml
+----
+--
+====
+. 원하는 네임스페이스에 스냅샷 컨트롤러를 생성합니다. 아래 YAML 매니페스트를 편집하여 네임스페이스를 수정하십시오.
++
+Kubernetes 1.20 이상의 경우 v5.0 이상을 사용합니다. Kubernetes 버전 1.19의 경우 v3.0.3을 사용합니다
+
++
+
+NOTE: GKE 환경에서 필요 시 볼륨 스냅샷을 설정하는 경우 스냅샷 컨트롤러를 생성하지 마십시오. GKE는 내장된 숨겨진 스냅샷 컨트롤러를 사용합니다.
+
++
+[role="tabbed-block"]
+====
+.v5.0 컨트롤러
+--
+[listing]
+----
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-5.0/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/release-5.0/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml
+----
+--
+.v3.0.3 컨트롤러
+--
+[listing]
+----
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v3.0.3/deploy/kubernetes/snapshot-controller/rbac-snapshot-controller.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/external-snapshotter/v3.0.3/deploy/kubernetes/snapshot-controller/setup-snapshot-controller.yaml
+----
+--
+====
+
+
+
+TIP: CSI Snapshotter는 를 제공합니다 https://github.com/kubernetes-csi/external-snapshotter#validating-webhook["Webhook 확인 중"^] 사용자가 기존 v1beta1 스냅샷의 유효성을 검사하고 유효한 리소스 객체인지 확인할 수 있도록 합니다. Validating webhook는 잘못된 스냅샷 개체에 자동으로 레이블을 지정하며 나중에 유효하지 않은 객체가 생성되지 않도록 합니다. Validating webhook은 Kubernetes Orchestrator에 의해 구축됩니다. 유효성을 검사하는 Webhook을 수동으로 배포하는 방법은 지침을 참조하십시오 https://github.com/kubernetes-csi/external-snapshotter/blob/release-3.0/deploy/kubernetes/webhook-example/README.md["여기"^]. 유효하지 않은 스냅샷 매니페스트의 예를 찾습니다 https://github.com/kubernetes-csi/external-snapshotter/tree/release-3.0/examples/kubernetes["여기"^].
+
+아래 예에서는 스냅샷 작업에 필요한 구조를 설명하고 스냅샷을 생성 및 사용하는 방법을 보여 줍니다.
+
+
+
+== 1단계: VolumeSnapshotClass 설정
+
+볼륨 스냅숏을 만들기 전에 링크를 설정합니다.../triment-reference/objects.html[`VolumeSnapshotClass`^].
+
+[listing]
+----
+cat snap-sc.yaml
+#Use apiVersion v1 for Kubernetes 1.20 and above. For Kubernetes 1.19, use apiVersion v1beta1.
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: csi-snapclass
+driver: csi.trident.netapp.io
+deletionPolicy: Delete
+----
+를 클릭합니다 `driver` Astra Trident의 CSI 드라이버를 가리킵니다. `deletionPolicy` 있을 수 있습니다 `Delete` 또는 `Retain`. 를 로 설정한 경우 `Retain`, 스토리지 클러스터의 기본 물리적 스냅샷은 가 있는 경우에도 유지됩니다 `VolumeSnapshot` 객체가 삭제되었습니다.
+
+
+
+== 2단계: 기존 PVC의 스냅샷을 생성합니다
+
+[listing]
+----
+cat snap.yaml
+#Use apiVersion v1 for Kubernetes 1.20 and above. For Kubernetes 1.19, use apiVersion v1beta1.
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: pvc1-snap
+spec:
+  volumeSnapshotClassName: csi-snapclass
+  source:
+    persistentVolumeClaimName: pvc1
+----
+스냅샷이 이름이 인 PVC에 대해 생성 중입니다 `pvc1`및 스냅샷의 이름이 로 설정됩니다 `pvc1-snap`.
+
+[listing]
+----
+kubectl create -f snap.yaml
+volumesnapshot.snapshot.storage.k8s.io/pvc1-snap created
+
+kubectl get volumesnapshots
+NAME                   AGE
+pvc1-snap              50s
+----
+이렇게 하면 가 생성됩니다 `VolumeSnapshot` 오브젝트. VolumeSnapshot은 PVC와 유사하며 와 관련이 있습니다 `VolumeSnapshotContent` 실제 스냅샷을 나타내는 객체입니다.
+
+를 식별할 수 있습니다 `VolumeSnapshotContent` 의 개체 `pvc1-snap` VolumeSnapshot을 설명합니다.
+
+[listing]
+----
+kubectl describe volumesnapshots pvc1-snap
+Name:         pvc1-snap
+Namespace:    default
+.
+.
+.
+Spec:
+  Snapshot Class Name:    pvc1-snap
+  Snapshot Content Name:  snapcontent-e8d8a0ca-9826-11e9-9807-525400f3f660
+  Source:
+    API Group:
+    Kind:       PersistentVolumeClaim
+    Name:       pvc1
+Status:
+  Creation Time:  2019-06-26T15:27:29Z
+  Ready To Use:   true
+  Restore Size:   3Gi
+.
+.
+----
+를 클릭합니다 `Snapshot Content Name` 이 스냅샷을 제공하는 VolumeSnapshotContent 객체를 식별합니다. 를 클릭합니다 `Ready To Use` 매개 변수는 스냅샷을 사용하여 새 PVC를 생성할 수 있음을 나타냅니다.
+
+
+
+== 3단계: VolumeSnapshots에서 PVC를 생성합니다
+
+스냅샷을 사용하여 PVC를 생성하는 예는 다음 예를 참조하십시오.
+
+[listing]
+----
+cat pvc-from-snap.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-from-snap
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: golden
+  resources:
+    requests:
+      storage: 3Gi
+  dataSource:
+    name: pvc1-snap
+    kind: VolumeSnapshot
+    apiGroup: snapshot.storage.k8s.io
+----
+`dataSource` 는 이름이 인 VolumeSnapshot을 사용하여 PVC를 생성해야 함을 나타냅니다 `pvc1-snap` 데이터 소스로 사용됩니다. 이렇게 하면 Astra Trident가 스냅샷에서 PVC를 생성하도록 지시합니다. PVC가 생성된 후 POD에 부착하여 다른 PVC와 마찬가지로 사용할 수 있습니다.
+
+
+NOTE: 연결된 스냅샷이 있는 영구 볼륨을 삭제하면 해당 Trident 볼륨이 "삭제 상태"로 업데이트됩니다. Astra Trident 볼륨을 삭제하려면 볼륨의 스냅샷을 제거해야 합니다.
+
+
+
+== 자세한 내용을 확인하십시오
+
+* link:../trident-concepts/snapshots.html["볼륨 스냅숏"^]
+* 링크:../트리덴트 - 참조/objects.html[`VolumeSnapshotClass`^]
+

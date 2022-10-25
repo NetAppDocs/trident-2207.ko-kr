@@ -1,0 +1,72 @@
+---
+sidebar: sidebar 
+permalink: trident-reco/security-reco.html 
+keywords: security, chap, trident, namespace, nve, nae, encryption, volume encryption, aggregate encryption 
+summary: 여기에 나열된 권장 사항을 사용하여 Astra Trident 설치가 안전한지 확인합니다. 
+---
+= 보안
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+여기에 나열된 권장 사항을 사용하여 Astra Trident 설치가 안전한지 확인합니다.
+
+
+
+== 자체 네임스페이스에서 Astra Trident를 실행합니다
+
+애플리케이션, 애플리케이션 관리자, 사용자 및 관리 애플리케이션에서 Astra Trident 객체 정의 또는 Pod에 액세스하여 안정적인 스토리지를 보장하고 잠재적인 악성 활동을 차단하는 것이 중요합니다.
+
+다른 애플리케이션과 사용자를 Astra Trident에서 분리하려면 항상 고유한 Kubernetes 네임스페이스에 Astra Trident를 설치하십시오 (`trident`)를 클릭합니다. Astra Trident를 자체 네임스페이스에 두면 Kubernetes 관리 담당자만 Astra Trident POD와 이름이 같은 CRD 객체에 저장된 아티팩트(예: 백엔드 및 CHAP 암호)에 액세스할 수 있습니다. 관리자만이 Astra Trident 네임스페이스에 액세스하고 에 액세스할 수 있도록 허용해야 합니다 `tridentctl` 응용 프로그램.
+
+
+
+== ONTAP SAN 백엔드에 CHAP 인증을 사용합니다
+
+Astra Trident는 ONTAP SAN 워크로드에 대한 CHAP 기반 인증을 지원합니다(사용 `ontap-san` 및 `ontap-san-economy` 드라이버). 호스트와 스토리지 백엔드 간의 인증을 위해 Astra Trident와 양방향 CHAP를 사용하는 것이 좋습니다.
+
+SAN 스토리지 드라이버를 사용하는 ONTAP 백엔드의 경우 Astra Trident는 양방향 CHAP를 설정하고 를 통해 CHAP 사용자 이름 및 암호를 관리할 수 있습니다 `tridentctl`. 을 참조하십시오 link:../trident-use/ontap-san-prep.html["여기"] Astra Trident가 ONTAP 백엔드에서 CHAP를 구성하는 방법을 이해합니다.
+
+
+NOTE: ONTAP 백엔드에 대한 CHAP 지원은 Trident 20.04 이상에서 사용할 수 있습니다.
+
+
+
+== NetApp HCI 및 SolidFire 백엔드에서 CHAP 인증을 사용합니다
+
+양방향 CHAP를 구축하여 호스트와 NetApp HCI 및 SolidFire 백엔드 간의 인증을 보장하는 것이 좋습니다. Astra Trident는 테넌트당 2개의 CHAP 암호를 포함하는 비밀 객체를 사용합니다. Trident를 CSI 프로비저닝자로 설치하면 CHAP 암호를 관리하고 에 저장합니다 `tridentvolume` 해당 PV에 대한 CR 개체입니다. PV를 생성할 때 CSI Astra Trident는 CHAP 암호를 사용하여 iSCSI 세션을 시작하고 CHAP를 통해 NetApp HCI 및 SolidFire 시스템과 통신합니다.
+
+
+NOTE: CSI Trident에서 생성한 볼륨은 볼륨 액세스 그룹과 연결되지 않습니다.
+
+CSI가 아닌 프런트엔드에서는 작업자 노드의 디바이스로 볼륨을 연결하는 작업을 Kubernetes에서 처리합니다. 볼륨 생성 후 Astra Trident는 NetApp HCI/SolidFire 시스템에 API 호출을 통해 해당 테넌트의 암호가 아직 없는 경우 비밀을 검색합니다. 그런 다음 Astra Trident가 Kubernetes에 비밀을 전달합니다. 각 노드에 위치한 kubelet은 Kubernetes API를 통해 기밀에 액세스하고 이를 사용하여 볼륨에 액세스하는 각 노드와 볼륨이 있는 NetApp HCI/SolidFire 시스템 간에 CHAP를 실행/사용하도록 설정합니다.
+
+
+
+== Astra Trident가 NVE 및 NAE와 연동되는 방식
+
+NetApp ONTAP는 유휴 데이터 암호화를 제공하여 디스크를 도난, 반환 또는 용도 변경할 때 중요한 데이터를 보호합니다. 자세한 내용은 을 참조하십시오 link:https://docs.netapp.com/us-en/ontap/encryption-at-rest/configure-netapp-volume-encryption-concept.html["NetApp 볼륨 암호화 구성 개요"^].
+
+* 백엔드에서 NAE가 활성화된 경우 Astra Trident에 프로비저닝된 모든 볼륨은 NAE가 활성화됩니다.
+* NAE가 백엔드에서 활성화되지 않은 경우, NVE 암호화 플래그를 로 설정하지 않으면 Astra Trident에 프로비저닝된 모든 볼륨은 NVE를 사용할 수 있습니다 `false` 백엔드 구성
+
+
+[NOTE]
+====
+NAE 지원 백엔드의 Astra Trident에 생성된 볼륨은 NVE 또는 NAE 암호화여야 합니다.
+
+* NVE 암호화 플래그를 로 설정할 수 있습니다 `true` Trident 백엔드 구성에서 NAE 암호화를 재정의하고 볼륨별로 특정 암호화 키를 사용합니다.
+* NVE 암호화 플래그를 로 설정합니다 `false` NAE 지원 백엔드에서 NAE 지원 볼륨을 생성합니다. NVE 암호화 플래그를 로 설정하여 NAE 암호화를 비활성화할 수 없습니다 `false`.
+
+
+====
+* NVE 암호화 플래그를 명시적으로 로 설정하여 Astra Trident에서 NVE 볼륨을 수동으로 생성할 수 있습니다 `true`.
+
+
+백엔드 구성 옵션에 대한 자세한 내용은 다음을 참조하십시오.
+
+* link:https://docs.netapp.com/us-en/trident/trident-use/ontap-san-examples.html["ONTAP SAN 구성 옵션"]
+* link:https://docs.netapp.com/us-en/trident/trident-use/ontap-nas-examples.html["ONTAP NAS 확인 옵션"]
+

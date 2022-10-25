@@ -1,0 +1,182 @@
+---
+sidebar: sidebar 
+permalink: trident-get-started/kubernetes-postdeployment.html 
+keywords: deploy, astra trident, methods, operator, tridentctl, helm, attributes, customize, tridentorchestrator, trident backend, storage class, create backend, create storage class, provision volume, mount volume 
+summary: Astra Trident를 구축한 후 백엔드 생성, 스토리지 클래스 생성, 볼륨 프로비저닝 및 POD에 볼륨 마운팅으로 진행할 수 있습니다. 
+---
+= 다음 단계
+:hardbreaks:
+:allow-uri-read: 
+:icons: font
+:imagesdir: ../media/
+
+
+Astra Trident를 구축한 후 백엔드 생성, 스토리지 클래스 생성, 볼륨 프로비저닝 및 POD에 볼륨 마운팅으로 진행할 수 있습니다.
+
+
+
+== 1단계: 백엔드를 생성합니다
+
+이제 Astra Trident에서 볼륨을 프로비저닝하는 데 사용할 백엔드를 만들 수 있습니다. 이렇게 하려면 을 만듭니다 `backend.json` 필요한 매개 변수가 포함된 파일입니다. 다양한 백엔드 유형에 대한 샘플 구성 파일은 에서 찾을 수 있습니다 `sample-input` 디렉토리.
+
+을 참조하십시오 link:../trident-use/backends.html["여기"^] 백엔드 유형에 맞게 파일을 구성하는 방법에 대한 자세한 내용은 을 참조하십시오.
+
+[listing]
+----
+cp sample-input/<backend template>.json backend.json
+vi backend.json
+----
+[listing]
+----
+./tridentctl -n trident create backend -f backend.json
++-------------+----------------+--------------------------------------+--------+---------+
+|    NAME     | STORAGE DRIVER |                 UUID                 | STATE  | VOLUMES |
++-------------+----------------+--------------------------------------+--------+---------+
+| nas-backend | ontap-nas      | 98e19b74-aec7-4a3d-8dcf-128e5033b214 | online |       0 |
++-------------+----------------+--------------------------------------+--------+---------+
+----
+생성에 실패하면 백엔드 구성에 문제가 있는 것입니다. 다음 명령을 실행하여 로그를 보고 원인을 확인할 수 있습니다.
+
+[listing]
+----
+./tridentctl -n trident logs
+----
+문제를 해결한 후 이 단계의 처음으로 돌아가서 다시 시도하십시오. 자세한 문제 해결 팁은 를 참조하십시오 link:../troubleshooting.html["문제 해결"^] 섹션을 참조하십시오.
+
+
+
+== 2단계: 스토리지 클래스를 생성합니다
+
+Kubernetes 사용자는 가 지정된 영구 PVC(Volume Claim)를 사용하여 볼륨을 프로비저닝합니다 https://kubernetes.io/docs/concepts/storage/storage-classes/["스토리지 클래스"^] 이름별. 세부 정보는 사용자로부터 숨겨지지만 스토리지 클래스는 해당 클래스에 사용되는 공급자(이 경우 Trident)와 해당 클래스가 프로비저닝자로부터 의미하는 바를 식별합니다.
+
+Kubernetes 스토리지 클래스를 생성할 때 볼륨을 지정할 시기를 지정하십시오. 수업 구성에서는 이전 단계에서 생성한 백엔드를 모델링해야 하므로 Astra Trident가 이를 사용하여 새 볼륨을 프로비저닝합니다.
+
+가장 간단한 스토리지 클래스는 을 기반으로 합니다 `sample-input/storage-class-csi.yaml.templ` 설치 프로그램과 함께 제공되는 파일로 대치합니다 `__BACKEND_TYPE__` 스토리지 드라이버 이름을 사용합니다.
+
+[listing]
+----
+./tridentctl -n trident get backend
++-------------+----------------+--------------------------------------+--------+---------+
+|    NAME     | STORAGE DRIVER |                 UUID                 | STATE  | VOLUMES |
++-------------+----------------+--------------------------------------+--------+---------+
+| nas-backend | ontap-nas      | 98e19b74-aec7-4a3d-8dcf-128e5033b214 | online |       0 |
++-------------+----------------+--------------------------------------+--------+---------+
+
+cp sample-input/storage-class-csi.yaml.templ sample-input/storage-class-basic-csi.yaml
+
+# Modify __BACKEND_TYPE__ with the storage driver field above (e.g., ontap-nas)
+vi sample-input/storage-class-basic-csi.yaml
+----
+Kubernetes 오브젝트이므로 를 사용할 수 있습니다 `kubectl` Kubernetes에서 생성해야 합니다.
+
+[listing]
+----
+kubectl create -f sample-input/storage-class-basic-csi.yaml
+----
+이제 Kubernetes 및 Astra Trident에 * basic-CSI * 스토리지 클래스가 표시됩니다. Astra Trident는 백엔드에서 풀을 검색했습니다.
+
+[listing]
+----
+kubectl get sc basic-csi
+NAME         PROVISIONER             AGE
+basic-csi    csi.trident.netapp.io   15h
+
+./tridentctl -n trident get storageclass basic-csi -o json
+{
+  "items": [
+    {
+      "Config": {
+        "version": "1",
+        "name": "basic-csi",
+        "attributes": {
+          "backendType": "ontap-nas"
+        },
+        "storagePools": null,
+        "additionalStoragePools": null
+      },
+      "storage": {
+        "ontapnas_10.0.0.1": [
+          "aggr1",
+          "aggr2",
+          "aggr3",
+          "aggr4"
+        ]
+      }
+    }
+  ]
+}
+----
+
+
+== 3단계: 첫 번째 볼륨을 프로비저닝합니다
+
+이제 첫 번째 볼륨을 동적으로 프로비저닝할 준비가 되었습니다. 이 작업은 Kubernetes를 생성하여 수행합니다 https://kubernetes.io/docs/concepts/storage/persistent-volumes["영구적 볼륨 클레임"^] (PVC) 개체.
+
+방금 만든 저장소 클래스를 사용하는 볼륨에 대해 PVC를 생성합니다.
+
+을 참조하십시오 `sample-input/pvc-basic-csi.yaml` 예를 들어, 스토리지 클래스 이름이 생성한 이름과 일치하는지 확인합니다.
+
+[listing]
+----
+kubectl create -f sample-input/pvc-basic-csi.yaml
+
+kubectl get pvc --watch
+NAME      STATUS    VOLUME                                     CAPACITY   ACCESS MODES  STORAGECLASS   AGE
+basic     Pending                                                                       basic          1s
+basic     Pending   pvc-3acb0d1c-b1ae-11e9-8d9f-5254004dfdb7   0                        basic          5s
+basic     Bound     pvc-3acb0d1c-b1ae-11e9-8d9f-5254004dfdb7   1Gi        RWO           basic          7s
+----
+
+
+== 4단계: POD에 볼륨을 마운트합니다
+
+이제 볼륨을 마운트하겠습니다. PV를 장착하는 nginx 포드를 시작합니다 `/usr/share/nginx/html`.
+
+[listing]
+----
+cat << EOF > task-pv-pod.yaml
+kind: Pod
+apiVersion: v1
+metadata:
+  name: task-pv-pod
+spec:
+  volumes:
+    - name: task-pv-storage
+      persistentVolumeClaim:
+       claimName: basic
+  containers:
+    - name: task-pv-container
+      image: nginx
+      ports:
+        - containerPort: 80
+          name: "http-server"
+      volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: task-pv-storage
+EOF
+kubectl create -f task-pv-pod.yaml
+----
+[listing]
+----
+# Wait for the pod to start
+kubectl get pod --watch
+
+# Verify that the volume is mounted on /usr/share/nginx/html
+kubectl exec -it task-pv-pod -- df -h /usr/share/nginx/html
+
+# Delete the pod
+kubectl delete pod task-pv-pod
+----
+이때 POD(애플리케이션)는 더 이상 존재하지 않지만 볼륨은 여전히 존재합니다. 원하는 경우 다른 포드에서 사용할 수 있습니다.
+
+볼륨을 삭제하려면 클레임을 삭제합니다.
+
+[listing]
+----
+kubectl delete pvc basic
+----
+이제 다음과 같은 추가 작업을 수행할 수 있습니다.
+
+* link:../trident-use/backends.html["추가 백엔드를 구성합니다."^]
+* link:../trident-use/manage-stor-class.html["추가 스토리지 클래스를 생성합니다."^]
+
