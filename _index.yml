@@ -31,12 +31,10 @@ indexpage:
       url: "/trident-managing-k8s/upgrade-tridentctl.html"
   - title: Astra Trident를 사용해 보십시오
     links:
+    - title: 작업자 노드를 준비합니다
+      url: "/trident-use/worker-node-prep.html"
     - title: 백엔드 구성
       url: "/trident-use/backends.html"
-    - title: kubectl로 백엔드를 만듭니다
-      url: "/trident-use/backend-kubectl.html"
-    - title: 백엔드 관리 옵션 간 이동
-      url: "/trident-use/backend_options.html"
     - title: 스토리지 클래스를 관리합니다
       url: "/trident-use/manage-stor-class.html"
     - title: 볼륨 작업을 수행합니다
