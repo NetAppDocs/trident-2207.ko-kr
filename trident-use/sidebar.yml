@@ -2,8 +2,6 @@
 section: trident-use
 title: Astra Trident를 사용해 보십시오
 entries:
-- title: 작업자 노드를 준비합니다
-  url: "/trident-use/worker-node-prep.html"
 - title: 백엔드 구성
   url: "/trident-use/backends.html"
   entries:
@@ -50,5 +48,7 @@ entries:
     url: "/trident-use/vol-expansion.html"
   - title: 볼륨 가져오기
     url: "/trident-use/vol-import.html"
+- title: 작업자 노드를 준비합니다
+  url: "/trident-use/worker-node-prep.html"
 - title: Astra Trident를 모니터링합니다
   url: "/trident-use/monitor-trident.html"

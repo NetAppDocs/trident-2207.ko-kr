@@ -18,6 +18,12 @@ NOTE: Astra Trident가 사용하는 포트에 대한 자세한 내용은 를 참
 
 
 
+== Kubernetes 1.25에 대한 중요 정보
+
+Kubernetes 1.25는 Astra Trident 22.10에서 지원됩니다. Kubernetes 1.25로 업그레이드하기 전에 Astra Trident 22.10으로 업그레이드해야 합니다.
+
+
+
 == 지원되는 프런트엔드(오케스트레이터)
 
 Astra Trident는 다음을 비롯한 여러 컨테이너 엔진과 오케스트레이터가 지원됩니다.
