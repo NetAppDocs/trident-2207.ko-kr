@@ -1539,7 +1539,7 @@
 <p class="page-details">
   
     
-    <time datetime="2022-10-25 16:48:58 +0000">10/25/2022</time>
+    <time datetime="2022-11-09 17:36:53 +0000">11/09/2022</time>
     
   
 
@@ -1620,35 +1620,45 @@
 </div>
 </li>
 <li>
-<p>다중 경로 데몬을 시작합니다.</p>
+<p>iscsi-initiator-utils 버전이 6.2.0.874-2.el7 이상인지 확인합니다.</p>
 <div class="paragraph">
-<p><code>sudo mpathconf --enable --with_multipathd y</code></p>
+<p><code>rpm -q iscsi-initiator-utils</code></p>
 </div>
 </li>
 <li>
-<p>확인하십시오 <code>iscsid</code> 및 <code>multipathd</code> 활성화 및 실행:</p>
+<p>스캔을 수동으로 설정합니다.</p>
 <div class="paragraph">
-<p><code>sudo systemctl enable iscsid multipathd</code><br>
-<code>sudo systemctl start iscsid multipathd</code></p>
+<p><code>sudo sed -i 's/^\(node.session.scan\).*/\1 = manual/' /etc/iscsi/iscsid.conf</code></p>
 </div>
 </li>
 <li>
-<p>iSCSI 타겟 검색:</p>
+<p>다중 경로 설정:</p>
 <div class="paragraph">
-<p><code>sudo iscsiadm -m discoverydb -t st -p &lt;DATA_LIF_IP&gt; --discover</code></p>
+<p><code>sudo mpathconf --enable --with_multipathd y --find_multipaths n</code></p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<img src="/us-en/trident-2207/images/note.svg" alt="참고">
+</td>
+<td class="content">
+확인합니다 <code>etc/multipath.conf</code> 포함 <code>find_multipaths no</code> 에서 <code>defaults</code>.
+</td>
+</tr>
+</table>
 </div>
 </li>
 <li>
-<p>검색된 iSCSI 대상에 로그인합니다.</p>
+<p>확인하십시오 <code>iscsid</code> 및 <code>multipathd</code> 실행 중:</p>
 <div class="paragraph">
-<p><code>sudo iscsiadm -m node -p &lt;DATA_LIF_IP&gt; --login</code></p>
+<p><code>sudo systemctl enable --now iscsid multipathd</code></p>
 </div>
 </li>
 <li>
 <p>활성화 및 시작 <code>iscsi</code>:</p>
 <div class="paragraph">
-<p><code>sudo systemctl enable iscsi</code><br>
-<code>sudo systemctl start iscsi</code></p>
+<p><code>sudo systemctl enable --now iscsi</code></p>
 </div>
 </li>
 </ol>
@@ -1668,34 +1678,48 @@
 </div>
 </li>
 <li>
+<p>open-iscsi 버전이 2.0.874-5ubuntu2.10 이상(bionic) 또는 2.0.874-7.1uubuttu6.1 이상(focal)인지 확인합니다.</p>
+<div class="paragraph">
+<p><code>dpkg -l open-iscsi</code></p>
+</div>
+</li>
+<li>
+<p>스캔을 수동으로 설정합니다.</p>
+<div class="paragraph">
+<p><code>sudo sed -i 's/^\(node.session.scan\).*/\1 = manual/' /etc/iscsi/iscsid.conf</code></p>
+</div>
+</li>
+<li>
 <p>다중 경로 설정:</p>
 <div class="paragraph">
 <p><code>sudo tee /etc/multipath.conf &lt;&#8592;'EOF'<br>
 defaults {<br>
     user_friendly_names yes<br>
-    find_multipaths yes<br>
+    find_multipaths no<br>
 }<br>
 EOF<br>
+sudo systemctl enable --now multipath-tools.service<br>
 sudo service multipath-tools restart</code></p>
 </div>
-</li>
-<li>
-<p>확인하십시오 <code>iscsid</code> 및 <code>multipathd</code> 실행 중:</p>
-<div class="paragraph">
-<p><code>sudo service open-iscsi start<br>
-sudo service multipath-tools start</code></p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<img src="/us-en/trident-2207/images/note.svg" alt="참고">
+</td>
+<td class="content">
+확인합니다 <code>etc/multipath.conf</code> 포함 <code>find_multipaths no</code> 에서 <code>defaults</code>.
+</td>
+</tr>
+</table>
 </div>
 </li>
 <li>
-<p>iSCSI 타겟 검색:</p>
+<p>확인하십시오 <code>open-iscsi</code> 및 <code>multipath-tools</code> 활성화 및 실행:</p>
 <div class="paragraph">
-<p><code>sudo iscsiadm -m discoverydb -t st -p &lt;DATA_LIF_IP&gt; --discover</code></p>
-</div>
-</li>
-<li>
-<p>검색된 iSCSI 대상에 로그인합니다.</p>
-<div class="paragraph">
-<p><code>sudo iscsiadm -m node -p &lt;DATA_LIF_IP&gt; --login</code></p>
+<p><code>sudo systemctl status multipath-tools</code><br>
+<code>sudo systemctl enable --now open-iscsi.service</code><br>
+<code>sudo systemctl status open-iscsi</code></p>
 </div>
 </li>
 </ol>
