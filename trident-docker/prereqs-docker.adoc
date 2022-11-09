@@ -50,27 +50,29 @@ RHEL/CentOS 7
 +
 `sudo yum install -y lsscsi iscsi-initiator-utils sg3_utils device-mapper-multipath`
 
-. 다중 경로 데몬을 시작합니다.
+. iscsi-initiator-utils 버전이 6.2.0.874-2.el7 이상인지 확인합니다.
 +
-`sudo mpathconf --enable --with_multipathd y`
+`rpm -q iscsi-initiator-utils`
 
-. 확인하십시오 `iscsid` 및 `multipathd` 활성화 및 실행:
+. 스캔을 수동으로 설정합니다.
 +
-`sudo systemctl enable iscsid multipathd`
-`sudo systemctl start iscsid multipathd`
+`sudo sed -i 's/^\(node.session.scan\).*/\1 = manual/' /etc/iscsi/iscsid.conf`
 
-. iSCSI 타겟 검색:
+. 다중 경로 설정:
 +
-`sudo iscsiadm -m discoverydb -t st -p <DATA_LIF_IP> --discover`
+`sudo mpathconf --enable --with_multipathd y --find_multipaths n`
 
-. 검색된 iSCSI 대상에 로그인합니다.
 +
-`sudo iscsiadm -m node -p <DATA_LIF_IP> --login`
+
+NOTE: 확인합니다 `etc/multipath.conf` 포함 `find_multipaths no` 에서 `defaults`.
+
+. 확인하십시오 `iscsid` 및 `multipathd` 실행 중:
++
+`sudo systemctl enable --now iscsid multipathd`
 
 . 활성화 및 시작 `iscsi`:
 +
-`sudo systemctl enable iscsi`
-`sudo systemctl start iscsi`
+`sudo systemctl enable --now iscsi`
 
 
 
@@ -83,28 +85,34 @@ RHEL/CentOS 7
 +
 `sudo apt-get install -y open-iscsi lsscsi sg3-utils multipath-tools scsitools`
 
+. open-iscsi 버전이 2.0.874-5ubuntu2.10 이상(bionic) 또는 2.0.874-7.1uubuttu6.1 이상(focal)인지 확인합니다.
++
+`dpkg -l open-iscsi`
+
+. 스캔을 수동으로 설정합니다.
++
+`sudo sed -i 's/^\(node.session.scan\).*/\1 = manual/' /etc/iscsi/iscsid.conf`
+
 . 다중 경로 설정:
 +
 `sudo tee /etc/multipath.conf <<-'EOF'
 defaults {
     user_friendly_names yes
-    find_multipaths yes
+    find_multipaths no
 }
 EOF
+sudo systemctl enable --now multipath-tools.service
 sudo service multipath-tools restart`
 
-. 확인하십시오 `iscsid` 및 `multipathd` 실행 중:
 +
-`sudo service open-iscsi start
-sudo service multipath-tools start`
 
-. iSCSI 타겟 검색:
-+
-`sudo iscsiadm -m discoverydb -t st -p <DATA_LIF_IP> --discover`
+NOTE: 확인합니다 `etc/multipath.conf` 포함 `find_multipaths no` 에서 `defaults`.
 
-. 검색된 iSCSI 대상에 로그인합니다.
+. 확인하십시오 `open-iscsi` 및 `multipath-tools` 활성화 및 실행:
 +
-`sudo iscsiadm -m node -p <DATA_LIF_IP> --login`
+`sudo systemctl status multipath-tools`
+`sudo systemctl enable --now open-iscsi.service`
+`sudo systemctl status open-iscsi`
 
 
 
