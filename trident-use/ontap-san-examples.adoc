@@ -237,7 +237,7 @@ NOTE: Astra Trident가 있는 NetApp ONTAP에서 Amazon FSx를 사용하는 경�
 
 
 
-=== 인증서 기반 인증을 갖춘 ONTAP-SAN 드라이버
+=== `ontap-san` 인증서 기반 인증을 사용하는 드라이버
 
 이는 최소 백엔드 구성의 예입니다. `clientCertificate`, `clientPrivateKey`, 및 `trustedCACertificate` (신뢰할 수 있는 CA를 사용하는 경우 선택 사항)는 에 채워집니다 `backend.json` 그리고 각각 클라이언트 인증서, 개인 키 및 신뢰할 수 있는 CA 인증서의 base64로 인코딩된 값을 사용합니다.
 
@@ -263,7 +263,7 @@ NOTE: Astra Trident가 있는 NetApp ONTAP에서 Amazon FSx를 사용하는 경�
 ----
 
 
-=== 양방향 CHAP가 있는 ONTAP-SAN 드라이버
+=== `ontap-san` 양방향 CHAP가 있는 드라이버
 
 이는 최소 백엔드 구성의 예입니다. 이 기본 구성은 를 생성합니다 `ontap-san` 을(를) 이용한 백엔드 `useCHAP` 를 로 설정합니다 `true`.
 
@@ -288,7 +288,7 @@ NOTE: Astra Trident가 있는 NetApp ONTAP에서 Amazon FSx를 사용하는 경�
 ----
 
 
-=== ONTAP-SAN - 경제적인 드라이버
+=== `ontap-san-economy` 드라이버
 
 [listing]
 ----

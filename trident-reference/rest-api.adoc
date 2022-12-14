@@ -22,7 +22,7 @@ API는 다음과 같이 작동합니다.
 
 
 
-== 가져오기
+== `GET`
 
 * `GET <trident-address>/trident/v1/<object-type>`: 해당 형식의 모든 개체를 나열합니다.
 * `GET <trident-address>/trident/v1/<object-type>/<object-name>`( Control 에서 상속됨): 명명된 개체의 세부 정보를 가져옵니다.
@@ -30,7 +30,7 @@ API는 다음과 같이 작동합니다.
 
 
 
-== 게시
+== `POST`
 
 `POST <trident-address>/trident/v1/<object-type>`: 지정된 형식의 개체를 만듭니다.
 
@@ -40,7 +40,7 @@ API는 다음과 같이 작동합니다.
 
 
 
-== 삭제
+== `DELETE`
 
 `DELETE <trident-address>/trident/v1/<object-type>/<object-name>`: 명명된 리소스를 삭제합니다.
 

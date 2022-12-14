@@ -16,6 +16,7 @@ summary: 제공된 샘플 구성을 사용하여 Trident 설치를 위한 백엔
 
 NOTE: Azure NetApp Files 서비스는 100GB 미만의 볼륨을 지원하지 않습니다. Astra Trident는 더 작은 볼륨을 요청하는 경우 100GB 볼륨을 자동으로 생성합니다.
 
+.필요한 것
 를 구성하고 사용합니다 https://azure.microsoft.com/en-us/services/netapp/["Azure NetApp Files"^] 백엔드, 다음이 필요합니다.
 
 * `subscriptionID` Azure NetApp Files가 활성화된 Azure 구독에서
@@ -28,6 +29,7 @@ TIP: Azure 기본 제공 역할에 대한 자세한 내용은 를 참조하십�
 * Azure NetApp Files를 처음 사용하거나 새 위치에서 사용하는 경우 일부 초기 구성이 필요합니다. 를 참조하십시오 https://docs.microsoft.com/en-us/azure/azure-netapp-files/azure-netapp-files-quickstart-set-up-account-create-volumes["빠른 시작 가이드"^].
 
 
+.이 작업에 대해
 Trident는 백엔드 구성(서브넷, 가상 네트워크, 서비스 수준 및 위치)을 기반으로 요청된 위치에서 사용 가능한 용량 풀에 ANF 볼륨을 생성하고 요청된 서비스 수준 및 서브넷과 일치시킵니다.
 
 

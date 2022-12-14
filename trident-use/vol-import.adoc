@@ -101,7 +101,7 @@ Trident 19.07 이상 버전에서는 PVS 연결을 처리하고 볼륨을 가져
 
 
 
-== ONTAP-NAS 및 ONTAP-NAS-Flexgroup 가져오기
+== `ontap-nas` 및 `ontap-nas-flexgroup` 가져오기
 
 로 생성된 각 볼륨입니다 `ontap-nas` 드라이버는 ONTAP 클러스터의 FlexVol입니다. 를 사용하여 FlexVol을 가져옵니다 `ontap-nas` 드라이버는 동일하게 작동합니다. ONTAP 클러스터에 이미 있는 FlexVol를 로 가져올 수 있습니다 `ontap-nas` PVC. 마찬가지로 FlexGroup vols는 로 가져올 수 있습니다 `ontap-nas-flexgroup` PVC
 
@@ -142,7 +142,7 @@ NOTE: 사용자 지정 UnixPermissions를 사용하여 볼륨을 가져오는 �
 
 
 
-== ONTAP-SAN 임포트
+== `ontap-san` 가져오기
 
 Astra Trident는 단일 LUN이 포함된 ONTAP SAN FlexVol도 가져올 수 있습니다. 이는 와 일치합니다 `ontap-san` 드라이버 - 각 PVC 및 FlexVol 내의 LUN에 대한 FlexVol를 생성합니다. 를 사용할 수 있습니다 `tridentctl import` 다른 경우와 동일한 방식으로 명령을 실행합니다.
 
@@ -181,7 +181,7 @@ IMPORTANT: Astra Trident에서 가져오려면 ONTAP 볼륨이 RW 유형이어�
 
 
 
-== 요소 불러오기
+== `element` 가져오기
 
 Trident를 사용하여 NetApp Element 소프트웨어/NetApp HCI 볼륨을 Kubernetes 클러스터로 가져올 수 있습니다. Astra Trident 백엔드의 이름과 볼륨의 고유 이름 및 PVC 파일이 의 인수로 필요합니다 `tridentctl import` 명령.
 
@@ -200,7 +200,7 @@ NOTE: Element 드라이버는 중복 볼륨 이름을 지원합니다. 중복된
 
 
 
-== GCP-CV 가져오기
+== `gcp-cvs` 가져오기
 
 
 TIP: GCP에서 NetApp Cloud Volumes Service가 지원하는 볼륨을 가져오려면 해당 이름 대신 볼륨 경로를 기준으로 볼륨을 식별합니다.
@@ -222,7 +222,7 @@ NOTE: 볼륨 경로는 / 이후의 볼륨 내보내기 경로 부분입니다. �
 
 
 
-== Azure-NetApp - 파일 가져오기
+== `azure-netapp-files` 가져오기
 
 을(를) 가져옵니다 `azure-netapp-files` 백엔드의 볼륨을 호출했습니다 `azurenetappfiles_40517` 볼륨 경로 포함 `importvol1`에서 다음 명령을 실행합니다.
 

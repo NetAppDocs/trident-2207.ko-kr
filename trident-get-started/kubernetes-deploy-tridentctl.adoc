@@ -19,6 +19,7 @@ TIP: 에 아직 익숙하지 않은 경우 link:../trident-concepts/intro.html["
 
 TIP: 배포를 사용자 지정하려면 을 참조하십시오 link:kubernetes-customize-deploy-tridentctl.html["여기"^].
 
+.필요한 것
 Astra Trident를 구축하려면 다음과 같은 사전 요구 사항을 충족해야 합니다.
 
 * 지원되는 Kubernetes 클러스터에 대한 모든 권한이 있습니다.

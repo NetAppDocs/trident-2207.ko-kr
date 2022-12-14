@@ -20,6 +20,7 @@ Trident 연산자를 사용하여 Astra Trident를 배포할 수 있습니다. T
 
 TIP: 에 아직 익숙하지 않은 경우 link:../trident-concepts/intro.html["기본 개념"^]이제 아주 좋은 시간입니다.
 
+.필요한 것
 Astra Trident를 구축하려면 다음과 같은 사전 요구 사항을 충족해야 합니다.
 
 * Kubernetes 1.19-1.24를 실행하는 지원되는 Kubernetes 클러스터에 대한 모든 권한이 있습니다.
@@ -39,6 +40,7 @@ Astra Trident를 구축하려면 다음과 같은 사전 요구 사항을 충족
 
 나열된 단계를 수행하여 Helm을 사용하여 Trident 연산자를 배포합니다.
 
+.필요한 것
 위에 나열된 필수 구성 요소 외에도 Hrom을 사용하여 Trident 연산자를 구축하려면 다음이 필요합니다.
 
 * Kubernetes 1.19-1.24
@@ -199,7 +201,7 @@ IMPORTANT: Kubernetes 클러스터에는 운영자의 인스턴스 * 하나가 �
 
 
 
-=== 3단계: Trident를 설치한 후 트리젠터레이터 생성
+=== 3단계: 작성 `TridentOrchestrator` Trident를 설치합니다
 
 이제 연산자를 사용하여 Astra Trident를 설치할 준비가 되었습니다! 이 작업을 수행하려면 을 만들어야 합니다 `TridentOrchestrator`. Trident 설치 프로그램에는 작성을 위한 예제 정의가 포함되어 있습니다 `TridentOrchestrator`. 그러면 에서 설치가 시작됩니다 `trident` 네임스페이스.
 

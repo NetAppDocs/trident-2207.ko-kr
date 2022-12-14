@@ -16,7 +16,7 @@ Astra Trident의 20.01 릴리즈부터 Kubernetes 계층에서 PVS의 스냅샷�
 
 NOTE: 이 기능은 Kubernetes 1.17(베타)에서 사용할 수 있으며 1.20에서 GA됩니다. 베타 버전에서 GA로 전환하는 데 따른 변경 사항을 이해하려면 를 참조하십시오 https://kubernetes.io/blog/2020/12/10/kubernetes-1.20-volume-snapshot-moves-to-ga/["릴리스 블로그"^]. GA로 졸업하면, 가 `v1` API 버전이 도입되었으며 와 이전 버전과 호환됩니다 `v1beta1` 스냅샷 수.
 
-.무엇을 &#8217;필요로 할거야
+.필요한 것
 * 볼륨 스냅숏을 생성하려면 외부 스냅샷 컨트롤러와 사용자 지정 리소스 정의(CRD)를 만들어야 합니다. 사용 중인 Kubernetes Orchestrator는 이 책임이 있습니다(예: Kubeadm, GKE, OpenShift).
 
 
@@ -91,7 +91,7 @@ TIP: CSI Snapshotter는 를 제공합니다 https://github.com/kubernetes-csi/ex
 
 
 
-== 1단계: VolumeSnapshotClass 설정
+== 1단계: 을 설정합니다 `VolumeSnapshotClass`
 
 볼륨 스냅숏을 만들기 전에 링크를 설정합니다.../triment-reference/objects.html[`VolumeSnapshotClass`^].
 

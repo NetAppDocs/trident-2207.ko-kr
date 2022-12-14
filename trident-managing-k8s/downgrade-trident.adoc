@@ -110,7 +110,7 @@ helm rollback trident [revision #]
 ----
 
 
-== tridentctl을 사용하여 Astra Trident가 설치된 경우의 다운그레이드 프로세스
+== 을 사용하여 Astra Trident를 설치한 경우의 다운그레이드 프로세스 `tridentctl`
 
 을 사용하여 Astra Trident를 설치한 경우 `tridentctl`다운그레이드 프로세스는 다음 단계를 포함합니다. 이 시퀀스는 Astra Trident 21.07에서 20.07로 이동하는 다운그레이드 프로세스를 안내합니다.
 

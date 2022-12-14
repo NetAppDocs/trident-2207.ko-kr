@@ -13,6 +13,7 @@ summary: '을 사용하여 기존 Astra Trident 설치를 쉽게 업그레이드
 
 을 사용하여 기존 Astra Trident 설치를 쉽게 업그레이드할 수 있습니다 `tridentctl`.
 
+.고려 사항
 Astra Trident의 최신 릴리즈로 업그레이드할 때 다음 사항을 고려하십시오.
 
 * Trident 20.01부터 베타 릴리즈만 제공됩니다 https://kubernetes.io/docs/concepts/storage/volume-snapshots/["볼륨 스냅숏"^] 가 지원됩니다. Kubernetes 관리자는 알파 스냅샷 개체를 베타로 안전하게 백업하거나 변환하여 레거시 알파 스냅샷을 유지하도록 주의해야 합니다.
@@ -22,6 +23,7 @@ Astra Trident의 최신 릴리즈로 업그레이드할 때 다음 사항을 고
 
 NOTE: https://netapp.io/2020/01/30/alpha-to-beta-snapshots/["블로그입니다"^] 알파 볼륨 스냅샷을 베타 형식으로 마이그레이션하는 단계에 대해 설명합니다.
 
+.이 작업에 대해
 Astra Trident를 제거하고 다시 설치하면 업그레이드 역할을 합니다. Trident를 제거할 때 Astra Trident 배포에 사용되는 영구 볼륨 클레임(PVC) 및 영구 볼륨(PV)은 삭제되지 않습니다. 이미 프로비저닝된 PVS는 Astra Trident가 오프라인 상태인 동안 계속 사용할 수 있으며, Astra Trident는 다시 온라인 상태가 되면 중간 기간 동안 생성된 모든 PVC에 대해 볼륨을 프로비저닝합니다.
 
 

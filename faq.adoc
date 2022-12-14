@@ -59,7 +59,7 @@ Astra Trident는 다른 NetApp 소프트웨어 제품에 종속되어 있지 않
 
 
 
-=== etcd의 지원되는 버전은 무엇입니까?
+=== 지원되는 버전의 은 무엇입니까 `etcd`?
 
 Astra Trident가 더 이상 필요하지 않습니다 `etcd`. CRD를 사용하여 상태를 유지합니다.
 

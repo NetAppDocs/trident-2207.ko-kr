@@ -95,7 +95,7 @@ WARNING: 자격 증명과 인증서 * 를 모두 제공하려고 하면 구성 �
 
 == NetApp ONTAP용 Amazon FSx를 사용하여 EKS에서 Astra Trident를 구축하고 구성합니다
 
-.무엇을 &#8217;필요로 할거야
+.필요한 것
 * 기존 Amazon EKS 클러스터 또는 자체 관리형 Kubernetes 클러스터 `kubectl` 설치되어 있습니다.
 * 클러스터의 작업자 노드에서 연결할 수 있는 NetApp ONTAP 파일 시스템용 기존 Amazon FSx 및 SVM(스토리지 가상 시스템)입니다.
 * 에 대해 준비된 작업자 노드입니다 link:worker-node-prep.html["NFS 및/또는 iSCSI"].
