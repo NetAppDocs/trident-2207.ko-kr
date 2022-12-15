@@ -145,7 +145,7 @@ function extractTableParameters(header) {
         parameter['in'] = 'body';
         parameter['required'] = fields[2].innerText;
         const type = parameter['type'].trim().toLowerCase();
-        if(type !== 'string' && type !== 'boolean' && type.indexOf('array') == -1) {
+        if(type !== 'string' && type !== 'boolean' && type.indexOf('array') == -1 && type.indexOf('string') == -1 && type.indexOf('integer') == -1) {
           // Resolve object definition
           parameter['parameters'] = extractTableParameters(type);
           parameter['type'] = 'object'; // set to common value
@@ -201,6 +201,8 @@ function initializeExplorerParameters(endpoint) {
       }
 
       addExplorerParameter(parameter['name'], type, parameter['in'], parameter['required']);
+    } else if(type.indexOf("string") != -1 || type.indexOf("integer") != -1) {
+      addExplorerParameter(parameter['name'], type, parameter['in'], parameter['required']); 
     } else if(type.indexOf("array") != -1 || type === 'boolean') {
       addExplorerParameter(parameter['name'], type, parameter['in'], parameter['required']);
     } else if(type.indexOf("object") != -1) {
@@ -217,8 +219,8 @@ function addExplorerParameter(name, type, location, required, parameters=null) {
   row.classList.add("row");
   row.classList.add("explorer-row");
   let element = null;
-  if(type === "string") {
-    element = createTextField(name, 'explorer-field');    
+  if(type === "string" || type.indexOf("string") != -1 || type.indexOf("integer") != -1) {
+    element = createTextField(name, 'explorer-field');
   } else if(type.indexOf("boolean") != -1) {
     const values = ['','true', 'false'];
     element = createSelect(values);
@@ -308,8 +310,8 @@ function createSelect(values) {
 function createCodeBlock(code, className) {
   let textarea = document.createElement("textarea");
   textarea.classList.add(className);
-  textarea.innerHTML = code;
-  
+  //textarea.innerHTML = code; changed to placeholder
+  textarea.placeholder = code;
   textarea.maxlength = 5000;
   return textarea;
 }

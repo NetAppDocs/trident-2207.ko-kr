@@ -1519,7 +1519,7 @@
 <p class="page-details">
   
     
-    <time datetime="2022-10-25 16:48:58 +0000">10/25/2022</time>
+    <time datetime="2022-12-14 18:32:04 +0000">12/14/2022</time>
     
   
 
@@ -1547,7 +1547,7 @@
 </div>
 </div>
 <div class="sect1">
-<h2 id="trientbackendconfig를-사용하여-tridentctl-백엔드를-관리합니다">TrientBackendConfig를 사용하여 tridentctl 백엔드를 관리합니다</h2>
+<h2 id="관리-tridentctl-을-사용하여-백엔드를-만듭니다-tridentbackendconfig">관리 <code>tridentctl</code> 을 사용하여 백엔드를 만듭니다 <code>TridentBackendConfig</code></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>이 섹션에서는 을 사용하여 만든 백엔드를 관리하는 데 필요한 단계를 설명합니다 <code>tridentctl</code> Kubernetes 인터페이스를 통해 직접 작성합니다 <code>TridentBackendConfig</code> 오브젝트.</p>
@@ -1671,7 +1671,7 @@ secret/backend-tbc-ontap-san-secret created</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="2단계-트리엔벤디config-cr을-작성합니다">2단계: 트리엔벤디Config CR을 작성합니다</h3>
+<h3 id="2단계-a를-작성합니다-tridentbackendconfig-있습니다">2단계: A를 작성합니다 <code>TridentBackendConfig</code> 있습니다</h3>
 <div class="paragraph">
 <p>다음 단계는 을 생성하는 것입니다 <code>TridentBackendConfig</code> 기존 에 자동으로 바인딩되는 CR입니다 <code>ontap-nas-backend</code> (이 예에서와 같이) 다음 요구 사항이 충족되는지 확인합니다.</p>
 </div>
@@ -1740,7 +1740,7 @@ tridentbackendconfig.trident.netapp.io/tbc-ontap-nas-backend created</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="3단계-트리엔디config-cr의-상태를-확인합니다">3단계: 트리엔디Config CR의 상태를 확인합니다</h3>
+<h3 id="3단계-의-상태를-확인합니다-tridentbackendconfig-있습니다">3단계: 의 상태를 확인합니다 <code>TridentBackendConfig</code> 있습니다</h3>
 <div class="paragraph">
 <p>를 누릅니다 <code>TridentBackendConfig</code> 이(가) 생성되었으며 해당 단계는 이어야 합니다 <code>Bound</code>. 또한 기존 백엔드의 백엔드 이름과 UUID도 동일하게 반영되어야 합니다.</p>
 </div>
@@ -1766,7 +1766,7 @@ tridentctl get backend -n trident
 </div>
 </div>
 <div class="sect1">
-<h2 id="tridentctl을-사용하여-trientbackendconfig-백엔드를-관리합니다">tridentctl을 사용하여 TrientBackendConfig 백엔드를 관리합니다</h2>
+<h2 id="관리-tridentbackendconfig-을-사용하여-백엔드를-만듭니다-tridentctl">관리 <code>TridentBackendConfig</code> 을 사용하여 백엔드를 만듭니다 <code>tridentctl</code></h2>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
@@ -1797,7 +1797,7 @@ tridentctl get backend ontap-san-backend -n trident
 </div>
 </div>
 <div class="sect2">
-<h3 id="단계-1-삭제-확인-정책이-유지로-설정되었습니다">단계 1: 삭제 확인 정책이 유지로 설정되었습니다</h3>
+<h3 id="1단계-확인-deletionpolicy-가-로-설정되어-있습니다-retain">1단계: 확인 <code>deletionPolicy</code> 가 로 설정되어 있습니다 <code>retain</code></h3>
 <div class="paragraph">
 <p>의 가치를 살펴보겠습니다 <code>deletionPolicy</code>. 이 설정은 로 설정해야 합니다 <code>retain</code>. 이렇게 하면 가 다음과 같은 경우에 사용할 수 있습니다 <code>TridentBackendConfig</code> CR이 삭제되어도 백엔드 정의가 계속 존재하고 로 관리할 수 있습니다 <code>tridentctl</code>.</p>
 </div>
@@ -1831,7 +1831,7 @@ backend-tbc-ontap-san   ontap-san-backend   81abcb27-ea63-49bb-b606-0a5315ac5f82
 </div>
 </div>
 <div class="sect2">
-<h3 id="2단계-트리펜엔드구성-cr을-삭제합니다">2단계: 트리펜엔드구성 CR을 삭제합니다</h3>
+<h3 id="2단계-를-삭제합니다-tridentbackendconfig-있습니다">2단계: 를 삭제합니다 <code>TridentBackendConfig</code> 있습니다</h3>
 <div class="paragraph">
 <p>마지막 단계는 를 삭제하는 것입니다 <code>TridentBackendConfig</code> 있습니다. 를 확인한 후 <code>deletionPolicy</code> 가 로 설정되어 있습니다 `retain`삭제 작업을 계속 수행할 수 있습니다.</p>
 </div>
