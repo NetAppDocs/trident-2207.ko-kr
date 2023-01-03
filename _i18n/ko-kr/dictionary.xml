@@ -1562,20 +1562,15 @@
   <block id="2a778cf7220cdde142651975e1bcd90f" category="paragraph">가상 풀 목록 외부에서 지정된 모든 측면은 백엔드에 대해 전역적이며 모든 가상 풀에 적용되지만, 각 가상 풀은 하나 이상의 측면을 개별적으로 지정할 수 있습니다(백엔드-글로벌 측면 재정의).</block>
   <block id="6aefc2a02fa1ec1f6ac8e9dbd5104efe" category="admonition">가상 스토리지 풀을 정의할 때 백엔드 정의에서 기존 가상 풀의 순서를 재정렬하지 마십시오. 또한 기존 가상 풀의 속성을 편집/수정하고 대신 새 가상 풀을 정의하는 것이 좋습니다.</block>
   <block id="5a53576f0ba98311e845ad0243bed6b7" category="paragraph">대부분의 측면은 백엔드 관련 용어로 지정됩니다. 결정적으로, Aspect 값은 백엔드의 드라이버 외부에 노출되지 않으며 에서 일치시킬 수 없습니다<block ref="f652904c3bfb48fb25a0a75f485f0ff6" prefix=" " category="inline-code"></block>. 대신 관리자는 각 가상 풀에 대해 하나 이상의 레이블을 정의합니다. 각 레이블은 키, 즉 값 쌍이며 레이블은 고유한 백엔드에서 공통일 수 있습니다. 측면과 마찬가지로 레이블을 풀별로 지정하거나 백엔드에 대해 전역으로 지정할 수 있습니다. 미리 정의된 이름과 값이 있는 측면과 달리 관리자는 필요에 따라 레이블 키와 값을 정의할 수 있습니다.</block>
-  <block id="a4d6bfb65b6541e04772c0d5180e726e" category="paragraph">A<block ref="e1e2a331ab1d8dccfea06fc8e04e2f5d" prefix=" " category="inline-code"></block> 선택기 매개 변수 내의 레이블을 참조하여 사용할 가상 풀을 식별합니다. 가상 풀 선택기는 6개의 연산자를 지원합니다.</block>
   <block id="e1b3ec89ead7f83a9245ed5c9cacfdbf" category="cell">운영자</block>
   <block id="499badcb6f450c7f46c51d873eb84286" category="cell"><block ref="43ec3e5dee6e706af7766fffea512721" prefix="" category="inline-code"></block></block>
   <block id="354653142ec321459dfd6d71444e992e" category="cell">성능 = 프리미엄</block>
-  <block id="d2c49c25d96d87e40bc641b9d5302b36" category="cell">풀의 레이블 값이 일치해야 합니다</block>
   <block id="5a5292b0a0d0379f0f1b12801b09b266" category="cell"><block ref="de0219f9333d57ea89a9ba235df098ba" prefix="" category="inline-code"></block></block>
   <block id="eccde6822783bd75209c9b6a2d357f6c" category="cell">성능!=최고</block>
-  <block id="2944853a5f146abd2671adbecd5c25a3" category="cell">풀의 레이블 값이 일치하지 않아야 합니다</block>
   <block id="ae2bef277194f73d24a36a78009aac1e" category="cell"><block ref="13b5bfe96f3e2fe411c9f66f4a582adf" prefix="" category="inline-code"></block></block>
   <block id="f8cf8c23afb5459dbf7c24b685caf85b" category="cell">위치(동쪽, 서쪽)</block>
-  <block id="26aac934d614b1b3e5db46d8fc664ec6" category="cell">풀의 레이블 값은 값 집합에 있어야 합니다</block>
   <block id="1a031eecbce49366e550273b9321b909" category="cell"><block ref="935f754ecc68ca688f61c154c404ed06" prefix="" category="inline-code"></block></block>
   <block id="b5585f3f9b45f391fee5dd15e6516450" category="cell">성능 노트(실버, 브론즈)</block>
-  <block id="499fec8ad2646f2de982559111e26a4c" category="cell">풀의 레이블 값은 b가 아니어야 합니다</block>
   <block id="ae8e28c37a725c4bb4a74663ac8615ea" category="summary">Astra Trident가 볼륨 액세스 그룹을 사용하는 방법에 대해 자세히 알아보십시오.</block>
   <block id="b4621305109716b02eed0cf25fabab13" category="doc">볼륨 액세스 그룹</block>
   <block id="33911b1eec54b4b5a7fbc504e6569989" category="inline-link">볼륨 액세스 그룹</block>
@@ -3286,4 +3281,16 @@
   <block id="809e945dc23c25ac16aba1fa16892444" category="section-title"><block ref="bc5779a2d33eeb1304bae57f15920cfc" prefix="" category="inline-code"></block> 가져오기</block>
   <block id="05390969246d98e9f73cc64a728aabb3" category="section-title">언제 사용해야 하는 지<block ref="26df55f7460e08309d510282499b6b1d" prefix=" " category="inline-code"></block>?</block>
   <block id="b1d2d86c217e78dcc1bee62d74d3346c" category="section-title">3단계: 작성<block ref="ae61bf6af1a7406b62c72a4bef1ab62d" prefix=" " category="inline-code"></block> Trident를 설치합니다</block>
+  <block id="758ef9050bcb89a046f8b79d56db9490" category="paragraph">A<block ref="e1e2a331ab1d8dccfea06fc8e04e2f5d" prefix=" " category="inline-code"></block> 선택기 매개 변수 내의 레이블을 참조하여 사용할 가상 풀을 식별합니다. 가상 풀 선택기는 다음 연산자를 지원합니다.</block>
+  <block id="3b64653c97a388d828849314b6a1b383" category="cell">풀의 레이블 값은 다음과 같아야 합니다.</block>
+  <block id="6da89265a9a8b0b28eb4946bb2ec0c6d" category="cell">일치</block>
+  <block id="ecf92052d55345fee4602d9eb8c22063" category="cell">일치하지 않습니다</block>
+  <block id="c6c1caf73b0f83d807abe5a717014ab7" category="cell">값 집합에 있어야 합니다</block>
+  <block id="8daf6b016f4033d59900c23f162c0f73" category="cell">값 집합에 있지 않습니다</block>
+  <block id="c6bfba38b789fec8271d1d1496a9ee59" category="cell"><block ref="42538adbdb6240b2b083a000a615d5bd" prefix="" category="inline-code"></block></block>
+  <block id="152f5dc0f7ac734f8e8ee17d4a482462" category="cell">보호</block>
+  <block id="7b532e697a35209f3df3956577cc3d9c" category="cell">모든 값과 함께 존재합니다</block>
+  <block id="eb0254f1d0a82e646c239d4d2e2f83ac" category="cell"><block ref="f65e5ff2a1bb1af969dccabe7dcd5cdd" prefix="" category="inline-code"></block></block>
+  <block id="67a3b723b2d9024808eb2c6e686d00a0" category="cell">! 보호</block>
+  <block id="1fde97909b90bb329db2062f7744bd45" category="cell">존재하지 않습니다</block>
 </blocks>
