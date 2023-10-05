@@ -9,24 +9,18 @@ settings:
     harmony_enabled: false
   rss_page: trident-rn.html
   versions:
-  - name: 아스트라 트리덴트
+  - version-number: '22.07'
     url: "/trident-2207"
-    version-number: '22.07'
-  - name: 아스트라 트리덴트
+  - version-number: '23.07'
     url: "/trident"
-    version-number: '23.07'
-  - name: 아스트라 트리덴트
+  - version-number: '22.04'
     url: "/trident-2204"
-    version-number: '22.04'
-  - name: 아스트라 트리덴트
+  - version-number: '22.01'
     url: "/trident-2201"
-    version-number: '22.01'
-  - name: 아스트라 트리덴트
+  - version-number: '21.10'
     url: "/trident-2110"
-    version-number: '21.10'
-  - name: 아스트라 트리덴트
+  - version-number: '21.07'
     url: "/trident-2107"
-    version-number: '21.07'
   langs: ko-kr,us-en,ja-jp,zh-cn,zh-tw,de-de,es-es,fr-fr,it-it
 sidebar:
   entries:
@@ -54,4 +48,3 @@ sidebar:
 product-family:
   name: Astra
   repo: astra-family
-  sidebar_label: 모든 Astra 문서
