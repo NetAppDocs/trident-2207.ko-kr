@@ -1,0 +1,2422 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head class="at-element-marker">
+  <title>CSI 토폴로지를 사용합니다</title>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge,chrome=1">
+  <meta http-equiv="language" content="en">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:title" content="CSI 토폴로지를 사용합니다" />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://docs.netapp.com/ko-kr/trident-2207/trident-use/csi-topology.html" />
+	<meta property="og:description" content="Astra Trident는 CSI 토폴로지 기능을 사용하여 Kubernetes 클러스터에 있는 노드를 선택적으로 생성하고 연결할 수 있습니다." />
+  <meta property="og:image" content="https://docs.netapp.com/ko-kr/trident-2207/images/logo-tophat-social.png" />
+  <meta property="og:image:alt" content="NetApp Logo" />
+  <meta name="format-detection" content="telephone=no">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="encoding" content="utf-8">
+  <meta http-equiv="nss-type" content="Product Documentation"/>
+  <meta http-equiv="nss-subtype" content="User Guide"/><meta name="description" content="Astra Trident는 CSI 토폴로지 기능을 사용하여 Kubernetes 클러스터에 있는 노드를 선택적으로 생성하고 연결할 수 있습니다.">
+  <meta name="keywords" content=" volumes, csi topology, storage classes, backends, kubernetes"><!-- Icons -->
+  <link rel="icon" href="/ko-kr/trident-2207/images/favicon.ico" type="image/x-icon">
+
+  <!-- RSS Feed --><!-- CSS Definitions: NetApp CSS should be defined after generic css -->
+
+
+  <!-- Combined CSS -->
+  <link rel="stylesheet" type="text/css" href="/ko-kr/trident-2207/css/ie-netappdocs.css">
+
+  
+  <link rel="stylesheet" href="/ko-kr/trident-2207/css/ie-landing-page.css" type="text/css">
+  <link rel="stylesheet" href="/ko-kr/trident-2207/css/ie-tabbed-blocks.css" type="text/css">
+  <!-- Canonical url -->
+  <link rel="canonical" href="https://docs.netapp.com/ko-kr/trident-2207/trident-use/csi-topology.html" />
+  <link rel="alternate" hreflang="x-default" href="https://docs.netapp.com/us-en/trident-2207/trident-use/csi-topology.html" />
+  <link rel="alternate" hreflang="ko" href="https://docs.netapp.com/ko-kr/trident-2207/trident-use/csi-topology.html" />
+  <link rel="alternate" hreflang="en" href="https://docs.netapp.com/us-en/trident-2207/trident-use/csi-topology.html" />
+  <link rel="alternate" hreflang="ja" href="https://docs.netapp.com/ja-jp/trident-2207/trident-use/csi-topology.html" />
+  <link rel="alternate" hreflang="zh-Hans" href="https://docs.netapp.com/zh-cn/trident-2207/trident-use/csi-topology.html" />
+  <link rel="alternate" hreflang="zh-Hant" href="https://docs.netapp.com/zh-tw/trident-2207/trident-use/csi-topology.html" />
+  <link rel="alternate" hreflang="de" href="https://docs.netapp.com/de-de/trident-2207/trident-use/csi-topology.html" />
+  <link rel="alternate" hreflang="es" href="https://docs.netapp.com/es-es/trident-2207/trident-use/csi-topology.html" />
+  <link rel="alternate" hreflang="fr" href="https://docs.netapp.com/fr-fr/trident-2207/trident-use/csi-topology.html" />
+  <link rel="alternate" hreflang="it" href="https://docs.netapp.com/it-it/trident-2207/trident-use/csi-topology.html" />
+  <!-- Top level site integrations -->
+<script type="text/javascript" src="https://cdn.cookielaw.org/consent/72570c5c-fe30-465f-b0e0-b77f7fb4ae34/OtAutoBlock.js"></script>
+    <script type="text/javascript" src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js" charset="UTF-8" data-document-language="true" data-domain-script="72570c5c-fe30-465f-b0e0-b77f7fb4ae34"></script>
+    <script type="text/javascript">function OptanonWrapper() { }</script>
+    <script type="text/plain" class="optanon-category-C0002" src="https://assets.adobedtm.com/60287eadf1ee/c284da483c83/launch-e9ff3acac59f.min.js"></script>
+    <script class="optanon-category-C0001">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.setAttributeNode(d.createAttribute('data-ot-ignore'));j.setAttribute('class','optanon-category-C0001');j.async=true;
+        j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl+'';f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-MD73T9M');</script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+  
+  <script>
+    $(document).ready(function() {
+      const MASTHEAD_OFFSET = 65;
+      const SECTIONS = $("main h2, main h3");
+      // PAGE NAV - Init
+      if (SECTIONS.length == 0) {
+        // remove if there is no elements
+        /*
+        $("#ie-right-navbar").remove();
+        $("#ie-right-navbar-collapse").remove();
+        */
+      } else {
+        $(".page-nav-title").css('display', 'block');
+        for (var i = 0; i < SECTIONS.length; i++) {
+          var sectionId = $(SECTIONS[i]).attr('id');
+          var sectionName = $(SECTIONS[i]).text();
+          var subClass = $(SECTIONS[i]).is("h3") ? ' page-nav__sublink' : '';
+          $("#page-menu").append('<li class="page-nav-item"><a href="#' + sectionId + '" class="page-nav__link' + subClass + '">' + sectionName + '</a></li>');
+        }
+        $(".page-nav__link").first().addClass('page-nav__link--active');
+      }
+    });
+  </script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+  <!-- Used for Product Family Page Sidebar Visibility --><!-- Used to import Promise for IE. Required for SearchKit -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script><script src='/ko-kr/trident-2207/js/na-search.js'></script><script src='/ko-kr/trident-2207/js/ie-clouddocs.js'></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><script>
+    /*
+      $(document).ready(function() {
+          $("#tg-sb-link").click(function() {
+              $("#tg-sb-sidebar").toggle();
+              $("#tg-sb-content").toggleClass('col-md-9');
+              $("#tg-sb-content").toggleClass('col-md-12');
+              $("#tg-sb-icon").toggleClass('fa-toggle-on');
+              $("#tg-sb-icon").toggleClass('fa-toggle-off');
+          });
+      });
+      */
+  </script>
+  <script src='/ko-kr/trident-2207/js/custom-dropdown.js'></script>
+  <script src='/ko-kr/trident-2207/js/FileSaver.min.js'></script>
+  <script src='/ko-kr/trident-2207/js/jszip-utils.min.js'></script>
+  <script src='/ko-kr/trident-2207/js/jszip.min.js'></script><script src='/ko-kr/trident-2207/js/ie-pdf-ux.js'></script></head>
+
+
+  <body class role="document" data-flavor=""><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MD73T9M"
+      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><div id="page" class="">
+      <div id="ie-phone-menu" class=""></div>
+      <div id="ie-content-wrap" class="">
+        <nav id="ie-new-header">
+    <ul>
+        <li id="ie-phone-menu-button">
+            <a href="#">
+                <image id="" src="/ko-kr/trident-2207/images/hamburger.svg" alt="menu" />
+            </a>
+        </li>
+
+        <li>
+            <a href="https://www.netapp.com/kr">
+                <image id="ie-header-logo" src="/ko-kr/trident-2207/images/netapp_logo.svg" alt="netapp" />
+            </a>
+        </li>
+        <li id="ie-header-docs">
+            <a href="https://www.netapp.com/support-and-training/documentation/">문서</a>
+        </li>
+
+        <!-- Empty container to push header left with or without lang selector -->
+        <li id="empty-container" style="margin-left: auto">
+        </li>
+        <!-- Start Language Selector --><li id="ie-language-dropdown">
+            <div id="language-dropdown" class="custom-dropdown custom-dropdown-lang">
+                <div class="custom-dropdown-select custom-dropdown-select-lang">
+                    <img src="/ko-kr/trident-2207/images/language_white_24dp.svg" class="n-globe__icon" />
+                    <span class="lang-name">한국어</span>
+                    <img src="/ko-kr/trident-2207/images/dropdown-arrow.svg" alt="" class="custom-icon chevrondown header invisible" />
+                    <img src="/ko-kr/trident-2207/images/dropdown-arrow.svg" alt="" class="custom-icon chevronup header" />
+                    </button>
+                </div>
+
+                <ul class="custom-dropdown-menu"><li>
+                        <a href="https://docs.netapp.com/ko-kr/trident-2207/trident-use/csi-topology.html"
+                            target="_self"><span translate="no" class="notranslate">한국어</span></a>
+                    </li><li>
+                        <a href="https://docs.netapp.com/us-en/trident-2207/trident-use/csi-topology.html"
+                            target="_self"><span translate="no" class="notranslate">English</span></a>
+                    </li><li>
+                        <a href="https://docs.netapp.com/ja-jp/trident-2207/trident-use/csi-topology.html"
+                            target="_self"><span translate="no" class="notranslate">日本語</span></a>
+                    </li><li>
+                        <a href="https://docs.netapp.com/zh-cn/trident-2207/trident-use/csi-topology.html"
+                            target="_self"><span translate="no" class="notranslate">简体中文</span></a>
+                    </li><li>
+                        <a href="https://docs.netapp.com/zh-tw/trident-2207/trident-use/csi-topology.html"
+                            target="_self"><span translate="no" class="notranslate">繁體中文</span></a>
+                    </li><li>
+                        <a href="https://docs.netapp.com/de-de/trident-2207/trident-use/csi-topology.html"
+                            target="_self"><span translate="no" class="notranslate">Deutsch</span></a>
+                    </li><li>
+                        <a href="https://docs.netapp.com/es-es/trident-2207/trident-use/csi-topology.html"
+                            target="_self"><span translate="no" class="notranslate">Español</span></a>
+                    </li><li>
+                        <a href="https://docs.netapp.com/fr-fr/trident-2207/trident-use/csi-topology.html"
+                            target="_self"><span translate="no" class="notranslate">Français</span></a>
+                    </li><li>
+                        <a href="https://docs.netapp.com/it-it/trident-2207/trident-use/csi-topology.html"
+                            target="_self"><span translate="no" class="notranslate">Italiano</span></a>
+                    </li></ul>
+            </div>
+            </li>
+        <!-- End Language Selector -->
+
+
+        <li id="ie-allnetapp">
+            <div id="allnetapp-dropdown" class="custom-dropdown custom-dropdown-allnetapp">
+                <div class="custom-dropdown-select custom-dropdown-select-allnetapp">
+                    <img src="/ko-kr/trident-2207/images/apps_white_24dp.svg" alt="" class="allnetapp-icon" />
+                    <span class="allnetapp-name">모든 NetApp</span>
+                    <img src="/ko-kr/trident-2207/images/dropdown-arrow.svg" alt="" class="custom-icon chevrondown header invisible" />
+                    <img src="/ko-kr/trident-2207/images/dropdown-arrow.svg" alt="" class="custom-icon chevronup header" />
+                    </button>
+                </div>
+
+                <ul class="custom-dropdown-menu allnetapp-dropdown">
+                    <li>
+                        <a href="https://bluexp.netapp.com/"
+                            target="_self"><span translate="no" class="notranslate">BlueXP</span></a>
+                    </li>
+                    <li>
+                        <a href="https://mysupport.netapp.com/site/"
+                            target="_self"><span translate="no" class="notranslate">지원</span></a>
+                    </li>
+                    <li>
+                        <a href="https://kb.netapp.com/"
+                            target="_self"><span translate="no" class="notranslate">기술 자료</span></a>
+                    </li>
+                    <li>
+                        <a href="https://www.netapp.com/ko/support-and-training/netapp-learning-services/"
+                            target="_self"><span translate="no" class="notranslate">교육</span></a>
+                    </li>
+                </ul>
+            </div>
+
+        </li>
+
+    </ul>
+</nav>
+
+        <main id="n-main-content" class="n-main-content">
+          <!-- Start Documentation Content -->
+<div class="ie-main">
+
+<div id="ie-new-sidebar-collapse" style="display: none">
+    <img id="sidebar-expand" class="ie-searchbox-icon" src="/ko-kr/trident-2207/images/double_arrow.svg" alt="" />
+</div>
+<div id="ie-new-sidebar">
+    <div id="ie-product-identity-lockup">
+        <div id="sidebar-collapse" class="">
+            <img src="/ko-kr/trident-2207/images/double_arrow.svg" alt="" />
+        </div>
+        <div id="ie-breadcrumb" class="">
+  <ul class="ie-breadcrumb">
+    <li class="">
+      <a href="https://docs.netapp.com">모든 문서</a>
+    </li>
+    
+    
+
+    
+    <li class="">
+      <a href="https://docs.netapp.com/ko-kr/astra-family/">
+        Astra
+      </a>
+    </li>
+    
+  </ul>
+  
+  <div class="ie-product-name" >
+    <!--<a href="/ko-kr/trident-2207/">-->
+      Astra Trident
+    <!--</a>-->
+  </div>
+</div>
+
+            
+<div id="ie-selectors"><div id="version-dropdown-new" class="custom-dropdown" >
+  <div class="custom-dropdown-select unselected" title=" 22.07">
+    <label>버전</label>
+    <span translate="no" class="notranslate">22.07</span>
+    <img src="/ko-kr/trident-2207/images/dropdown-arrow.svg" alt="" class="custom-icon chevrondown version invisible" />
+    <img src="/ko-kr/trident-2207/images/dropdown-arrow.svg" alt="" class="custom-icon chevronup version" />
+  </div>
+
+  <ul class="custom-dropdown-menu"><li>
+      
+      <a href="https://docs.netapp.com/ko-kr/trident-2207/trident-use/csi-topology.html" target="_self">
+        <span translate="no" class="notranslate"><span class="version"> 22.07</span></span>
+      </a>
+                     
+    </li>
+    <li>
+      
+      <a href="https://docs.netapp.com/ko-kr/trident/trident-use/csi-topology.html" target="_self">
+        <span translate="no" class="notranslate"><span class="version"> 23.07</span></span>
+      </a>
+                     
+    </li>
+    <li>
+      
+      <a href="https://docs.netapp.com/ko-kr/trident-2204/trident-use/csi-topology.html" target="_self">
+        <span translate="no" class="notranslate"><span class="version"> 22.04</span></span>
+      </a>
+                     
+    </li>
+    <li>
+      
+      <a href="https://docs.netapp.com/ko-kr/trident-2201/trident-use/csi-topology.html" target="_self">
+        <span translate="no" class="notranslate"><span class="version"> 22.01</span></span>
+      </a>
+                     
+    </li>
+    <li>
+      
+      <a href="https://docs.netapp.com/ko-kr/trident-2110/trident-use/csi-topology.html" target="_self">
+        <span translate="no" class="notranslate"><span class="version"> 21.10</span></span>
+      </a>
+                     
+    </li>
+    <li>
+      
+      <a href="https://docs.netapp.com/ko-kr/trident-2107/trident-use/csi-topology.html" target="_self">
+        <span translate="no" class="notranslate"><span class="version"> 21.07</span></span>
+      </a>
+                     
+    </li>
+    
+  </ul>
+</div></div>
+        
+        
+
+<div id="ie-searchbox" class="ie-searchbox-sidebar ">
+    <img class="ie-searchbox-icon" src="/ko-kr/trident-2207/images/loupe.svg" alt=""/>
+    <div id="react-search" 
+        data-search-html="/ko-kr/trident-2207/search.html" 
+        data-type="widget"
+        data-placeholder="설명서 검색"
+        data-no-results-found="{query}에 대한 결과를 찾을 수 없습니다"
+        data-did-you-mean="{suggestion}을(를) 검색하십시오."
+        data-no-results-found-did-you-mean="{query}에 대한 결과가 없습니다. {suggestion}을(를) 찾고 계시는 건가요?"
+        data-results-found="{hitCount}개의 결과를 찾았습니다"
+        data-error-message="오류가 발생했습니다. 다시 시도해 주십시오."
+        data-error-reset="검색 재설정"
+        data-sk-es-pf-indexes="" 
+        data-flavor="">
+    </div>
+</div>
+        
+    </div>
+    <div id="ie-new-toc"><script>
+  let sidebarAccordion = true;
+
+  /* specific css rules for Mac */
+  if(navigator.platform.match('Mac') !== null) {
+    document.body.setAttribute('class', 'OSX');
+  }
+
+</script>
+
+<div id="ie-sidebar-container">
+  <ul id="ie-sidebar-list" ><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Astra Trident 문서"
+      data-li-level="1#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/index.html" 
+    ><a class="ie-sidebar-menuitem-1 " href="/ko-kr/trident-2207/index.html">
+        Astra Trident 문서
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="릴리스 정보"
+      data-li-level="1#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-rn.html" 
+    ><a class="ie-sidebar-menuitem-1 " href="/ko-kr/trident-2207/trident-rn.html">
+        릴리스 정보
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="개념"
+      data-li-level="1" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="" 
+    ><a class="ie-sidebar-menuitem-1  ie-sidebar-button " href="#">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> 개념</div>-->
+         개념
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Astra Trident에 대해 자세히 알아보십시오"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-concepts/intro.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-concepts/intro.html">
+        Astra Trident에 대해 자세히 알아보십시오
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="ONTAP 드라이버"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-concepts/ontap-drivers.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-concepts/ontap-drivers.html">
+        ONTAP 드라이버
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="프로비저닝"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-concepts/provisioning.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-concepts/provisioning.html">
+        프로비저닝
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="볼륨 스냅숏"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-concepts/snapshots.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-concepts/snapshots.html">
+        볼륨 스냅숏
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="가상 스토리지 풀"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-concepts/virtual-storage-pool.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-concepts/virtual-storage-pool.html">
+        가상 스토리지 풀
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="볼륨 액세스 그룹"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-concepts/vol-access-groups.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-concepts/vol-access-groups.html">
+        볼륨 액세스 그룹
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="시작하십시오"
+      data-li-level="1" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="" 
+    ><a class="ie-sidebar-menuitem-1  ie-sidebar-button " href="#">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> 시작하십시오</div>-->
+         시작하십시오
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="시도해 보십시오"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-get-started/quickstart.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-get-started/quickstart.html">
+        시도해 보십시오
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="요구 사항"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-get-started/requirements.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-get-started/requirements.html">
+        요구 사항
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="구축 개요"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-get-started/kubernetes-deploy.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-get-started/kubernetes-deploy.html">
+        구축 개요
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Trident 연산자를 사용하여 구축"
+      data-li-level="2" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-get-started/kubernetes-deploy-operator.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-get-started/kubernetes-deploy-operator.html">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> Trident 연산자를 사용하여 구축</div>-->
+         Trident 연산자를 사용하여 구축
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Trident 운영자 배포를 사용자 지정합니다"
+      data-li-level="3#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-get-started/kubernetes-customize-deploy.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-get-started/kubernetes-customize-deploy.html">
+        Trident 운영자 배포를 사용자 지정합니다
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="tridentctl을 사용하여 배포합니다"
+      data-li-level="2" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-get-started/kubernetes-deploy-tridentctl.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-get-started/kubernetes-deploy-tridentctl.html">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> tridentctl을 사용하여 배포합니다</div>-->
+         tridentctl을 사용하여 배포합니다
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="tridentctl 배포를 사용자 지정합니다"
+      data-li-level="3#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-get-started/kubernetes-customize-deploy-tridentctl.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-get-started/kubernetes-customize-deploy-tridentctl.html">
+        tridentctl 배포를 사용자 지정합니다
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="다음 단계"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-get-started/kubernetes-postdeployment.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-get-started/kubernetes-postdeployment.html">
+        다음 단계
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Astra Trident 관리"
+      data-li-level="1" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="" 
+    ><a class="ie-sidebar-menuitem-1  ie-sidebar-button " href="#">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> Astra Trident 관리</div>-->
+         Astra Trident 관리
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Astra Trident를 업그레이드합니다"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-managing-k8s/upgrade-trident.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-managing-k8s/upgrade-trident.html">
+        Astra Trident를 업그레이드합니다
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="운영자와 함께 업그레이드하십시오"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-managing-k8s/upgrade-operator.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-managing-k8s/upgrade-operator.html">
+        운영자와 함께 업그레이드하십시오
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="tridentctl로 업그레이드하십시오"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-managing-k8s/upgrade-tridentctl.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-managing-k8s/upgrade-tridentctl.html">
+        tridentctl로 업그레이드하십시오
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Astra Trident를 제거합니다"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-managing-k8s/uninstall-trident.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-managing-k8s/uninstall-trident.html">
+        Astra Trident를 제거합니다
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Astra Trident를 다운그레이드하십시오"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-managing-k8s/downgrade-trident.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-managing-k8s/downgrade-trident.html">
+        Astra Trident를 다운그레이드하십시오
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Astra Trident를 사용해 보십시오"
+      data-li-level="1" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="" 
+    ><a class="ie-sidebar-menuitem-1  ie-sidebar-button " href="#">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> Astra Trident를 사용해 보십시오</div>-->
+         Astra Trident를 사용해 보십시오
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="백엔드 구성"
+      data-li-level="2" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/backends.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-use/backends.html">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> 백엔드 구성</div>-->
+         백엔드 구성
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="ANF 백엔드를 구성합니다"
+      data-li-level="3#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/anf.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-use/anf.html">
+        ANF 백엔드를 구성합니다
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="CVS for GCP 백엔드를 구성합니다"
+      data-li-level="3#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/gcp.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-use/gcp.html">
+        CVS for GCP 백엔드를 구성합니다
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="NetApp HCI 또는 SolidFire 백엔드를 구성합니다"
+      data-li-level="3#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/element.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-use/element.html">
+        NetApp HCI 또는 SolidFire 백엔드를 구성합니다
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="ONTAP SAN 드라이버를 사용하여 백엔드를 구성합니다"
+      data-li-level="3" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/ontap-san.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-use/ontap-san.html">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> ONTAP SAN 드라이버를 사용하여 백엔드를 구성합니다</div>-->
+         ONTAP SAN 드라이버를 사용하여 백엔드를 구성합니다
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="준비"
+      data-li-level="4#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/ontap-san-prep.html" 
+    ><a class="ie-sidebar-menuitem-4 " href="/ko-kr/trident-2207/trident-use/ontap-san-prep.html">
+        준비
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="구성 옵션 및 예"
+      data-li-level="4#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/ontap-san-examples.html" 
+    ><a class="ie-sidebar-menuitem-4 " href="/ko-kr/trident-2207/trident-use/ontap-san-examples.html">
+        구성 옵션 및 예
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="ONTAP NAS 드라이버를 사용하여 백엔드를 구성합니다"
+      data-li-level="3" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/ontap-nas.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-use/ontap-nas.html">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> ONTAP NAS 드라이버를 사용하여 백엔드를 구성합니다</div>-->
+         ONTAP NAS 드라이버를 사용하여 백엔드를 구성합니다
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="준비"
+      data-li-level="4#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/ontap-nas-prep.html" 
+    ><a class="ie-sidebar-menuitem-4 " href="/ko-kr/trident-2207/trident-use/ontap-nas-prep.html">
+        준비
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="구성 옵션 및 예"
+      data-li-level="4#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/ontap-nas-examples.html" 
+    ><a class="ie-sidebar-menuitem-4 " href="/ko-kr/trident-2207/trident-use/ontap-nas-examples.html">
+        구성 옵션 및 예
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="NetApp ONTAP용 Amazon FSx와 함께 Astra Trident를 사용하십시오"
+      data-li-level="3#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/trident-fsx.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-use/trident-fsx.html">
+        NetApp ONTAP용 Amazon FSx와 함께 Astra Trident를 사용하십시오
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="kubectl로 백엔드를 만듭니다"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/backend-kubectl.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-use/backend-kubectl.html">
+        kubectl로 백엔드를 만듭니다
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="kubeck을 사용하여 백엔드 관리 수행"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/backend_ops_kubectl.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-use/backend_ops_kubectl.html">
+        kubeck을 사용하여 백엔드 관리 수행
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="tridentctl을 사용하여 백엔드 관리를 수행합니다"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/backend_ops_tridentctl.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-use/backend_ops_tridentctl.html">
+        tridentctl을 사용하여 백엔드 관리를 수행합니다
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="백엔드 관리 옵션 간 이동"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/backend_options.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-use/backend_options.html">
+        백엔드 관리 옵션 간 이동
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="스토리지 클래스를 관리합니다"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/manage-stor-class.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-use/manage-stor-class.html">
+        스토리지 클래스를 관리합니다
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="볼륨 작업을 수행합니다"
+      data-li-level="2" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/vol-operations.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-use/vol-operations.html">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> 볼륨 작업을 수행합니다</div>-->
+         볼륨 작업을 수행합니다
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="CSI 토폴로지를 사용합니다"
+      data-li-level="3#" 
+      class="  ie-sidebar-selected    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/csi-topology.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-use/csi-topology.html">
+        CSI 토폴로지를 사용합니다
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="스냅샷 작업"
+      data-li-level="3#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/vol-snapshots.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-use/vol-snapshots.html">
+        스냅샷 작업
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="볼륨 확장"
+      data-li-level="3#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/vol-expansion.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-use/vol-expansion.html">
+        볼륨 확장
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="볼륨 가져오기"
+      data-li-level="3#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/vol-import.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-use/vol-import.html">
+        볼륨 가져오기
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="작업자 노드를 준비합니다"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/worker-node-prep.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-use/worker-node-prep.html">
+        작업자 노드를 준비합니다
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Astra Trident를 모니터링합니다"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-use/monitor-trident.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-use/monitor-trident.html">
+        Astra Trident를 모니터링합니다
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Docker를 위한 Astra Trident"
+      data-li-level="1" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="" 
+    ><a class="ie-sidebar-menuitem-1  ie-sidebar-button " href="#">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> Docker를 위한 Astra Trident</div>-->
+         Docker를 위한 Astra Trident
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="배포를 위한 사전 요구 사항"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-docker/prereqs-docker.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-docker/prereqs-docker.html">
+        배포를 위한 사전 요구 사항
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Astra Trident 구축"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-docker/deploy-docker.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-docker/deploy-docker.html">
+        Astra Trident 구축
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Trident 업그레이드 또는 제거"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-docker/upgrade-uninstall-docker.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-docker/upgrade-uninstall-docker.html">
+        Trident 업그레이드 또는 제거
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="볼륨 작업"
+      data-li-level="2" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-docker/volumes-docker.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-docker/volumes-docker.html">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> 볼륨 작업</div>-->
+         볼륨 작업
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="드라이버별 볼륨 옵션"
+      data-li-level="3#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-docker/volume-driver-options.html" 
+    ><a class="ie-sidebar-menuitem-3 " href="/ko-kr/trident-2207/trident-docker/volume-driver-options.html">
+        드라이버별 볼륨 옵션
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="로그를 수집합니다"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-docker/collect-logs-docker.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-docker/collect-logs-docker.html">
+        로그를 수집합니다
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="여러 Astra Trident 인스턴스를 관리합니다"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-docker/multiple-instances-docker.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-docker/multiple-instances-docker.html">
+        여러 Astra Trident 인스턴스를 관리합니다
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="스토리지 구성 옵션"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-docker/stor-config.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-docker/stor-config.html">
+        스토리지 구성 옵션
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="알려진 문제"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-docker/known-issues-docker.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-docker/known-issues-docker.html">
+        알려진 문제
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="FAQ 를 참조하십시오"
+      data-li-level="1#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/faq.html" 
+    ><a class="ie-sidebar-menuitem-1 " href="/ko-kr/trident-2207/faq.html">
+        FAQ 를 참조하십시오
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="지원"
+      data-li-level="1#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/get-help.html" 
+    ><a class="ie-sidebar-menuitem-1 " href="/ko-kr/trident-2207/get-help.html">
+        지원
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="문제 해결"
+      data-li-level="1#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/troubleshooting.html" 
+    ><a class="ie-sidebar-menuitem-1 " href="/ko-kr/trident-2207/troubleshooting.html">
+        문제 해결
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="모범 사례 및 권장사항"
+      data-li-level="1" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="" 
+    ><a class="ie-sidebar-menuitem-1  ie-sidebar-button " href="#">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> 모범 사례 및 권장사항</div>-->
+         모범 사례 및 권장사항
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="구축"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-reco/deploy-reco.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-reco/deploy-reco.html">
+        구축
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="스토리지 구성"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-reco/storage-config-best-practices.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-reco/storage-config-best-practices.html">
+        스토리지 구성
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Astra Trident 통합"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-reco/integrate-trident.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-reco/integrate-trident.html">
+        Astra Trident 통합
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="데이터 보호"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-reco/backup.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-reco/backup.html">
+        데이터 보호
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="보안"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-reco/security-reco.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-reco/security-reco.html">
+        보안
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="참조하십시오"
+      data-li-level="1" 
+      class=" sidebar-folder    "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="" 
+    ><a class="ie-sidebar-menuitem-1  ie-sidebar-button " href="#">
+        <img class="ie-sidebar-icon ie-sidebar-button open" src="/ko-kr/trident-2207/images/link_expand.svg" alt="" />
+        <img class="ie-sidebar-icon ie-sidebar-button close" src="/ko-kr/trident-2207/images/link_collapse.svg" alt="" />
+        <!--<div class="" style="display: inline;"> 참조하십시오</div>-->
+         참조하십시오
+      </a>
+      <ul class="">
+        <li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Astra Trident 포트"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-reference/trident-ports.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-reference/trident-ports.html">
+        Astra Trident 포트
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Astra Trident REST API"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-reference/rest-api.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-reference/rest-api.html">
+        Astra Trident REST API
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="명령줄 옵션"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-reference/trident-cl.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-reference/trident-cl.html">
+        명령줄 옵션
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Kubernetes와 통합된 NetApp 제품"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-reference/k8s-netapp.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-reference/k8s-netapp.html">
+        Kubernetes와 통합된 NetApp 제품
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="Kubernetes 및 Astra Trident 오브젝트"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-reference/objects.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-reference/objects.html">
+        Kubernetes 및 Astra Trident 오브젝트
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="tridentctl 명령 및 옵션"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-reference/tridentctl.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-reference/tridentctl.html">
+        tridentctl 명령 및 옵션
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="POD 보안 표준(PSS) 및 보안 컨텍스트 제약(SCC)"
+      data-li-level="2#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/trident-reference/pod-security.html" 
+    ><a class="ie-sidebar-menuitem-2 " href="/ko-kr/trident-2207/trident-reference/pod-security.html">
+        POD 보안 표준(PSS) 및 보안 컨텍스트 제약(SCC)
+      </a></li></ul></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="이전 버전"
+      data-li-level="1#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/earlier-versions.html" 
+    ><a class="ie-sidebar-menuitem-1 " href="/ko-kr/trident-2207/earlier-versions.html">
+        이전 버전
+      </a></li><li 
+      data-pdf-exists="true" 
+      data-pdf-filename="법적 고지"
+      data-li-level="1#" 
+      class="   "
+      dale-page-url="/trident-use/csi-topology.html" 
+      dale-entry-url="/legal.html" 
+    ><a class="ie-sidebar-menuitem-1 " href="/ko-kr/trident-2207/legal.html">
+        법적 고지
+      </a></li></ul>
+</div>
+<script>
+
+  $(".ie-sidebar-button").click(function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    expandedLI = $('li.ie-sidebar-expand')
+
+    const li = $(this).closest("li");
+
+    const parentsLI = $(li).parents('li');
+
+    expandedLI.map(element => {
+      if (sidebarAccordion && !li.hasClass('ie-sidebar-expand') && jQuery.inArray(expandedLI[element], parentsLI) == -1) {
+        $(expandedLI[element]).toggleClass('ie-sidebar-expand');
+        $(expandedLI[element]).children("ul").animate({ height: 'toggle' }, 400, function () {
+          $(li).children("ul").toggleClass('ie-sidebar-open');
+
+        })
+      }
+
+    })
+
+    $(li).toggleClass('ie-sidebar-expand');
+    $(li).children("ul").animate({ height: 'toggle' }, 400, function () {
+      $(li).children("ul").toggleClass('ie-sidebar-open');
+    })
+  });
+
+
+  
+    $("li.ie-sidebar-selected").parents('ul').toggleClass("ie-sidebar-open");
+    $("li.ie-sidebar-selected").toggleClass("ie-sidebar-expand")
+    $("ul.ie-sidebar-open").parent().toggleClass("ie-sidebar-expand");
+    $("li.ie-sidebar-selected").children('ul').toggleClass("ie-sidebar-open")
+  
+  
+</script>
+    </div>
+</div>
+<script>
+
+    
+    let sidebarScrollTopPosition = 0;
+    $("#ie-new-toc").on("scroll", function () {
+        if (sidebarScrollTopPosition == 0) {
+            $.cookie("sidebarScroll", $("#ie-new-toc").scrollTop(), {
+                path: "/ko-kr/trident-2207"
+            });
+        }
+
+        if ($("#ie-new-toc").scrollTop() > 0) {
+            $('#ie-product-identity-lockup').addClass('ie-addShadow');
+        } else {
+            $('#ie-product-identity-lockup').removeClass('ie-addShadow');
+        }
+    });
+
+    $(function () {
+        if ($.cookie("sidebarScroll")) {
+            $("#ie-new-toc").scrollTop($.cookie("sidebarScroll"));
+        }
+    });
+
+    function setSidebarBottom() {
+        const footerGap = PXinViewport($(".n-footer"));
+        document.getElementById("ie-new-sidebar").style.bottom = Math.max(0, footerGap) + "px";
+    }
+
+    window.onscroll = () => {
+        setSidebarBottom();
+    };
+
+    $("#sidebar-collapse").click(function (e) {
+        const sidebarWidth = $("#ie-new-sidebar").width() - $("#ie-new-sidebar-collapse").width();
+        e.preventDefault();
+        const width = $(".ie-content-pane").width();
+        const marginLeft = parseInt($(".ie-content-pane").css('marginLeft'));
+
+        if ($.cookie("sidebarScroll")) {
+            sidebarScrollTopPosition = $.cookie("sidebarScroll");
+        }
+
+        $("#ie-new-sidebar").animate({ width: 'toggle' }, 350, function () {
+            $("#ie-new-sidebar-collapse").show();
+            $("#ie-new-sidebar").removeClass("open")
+            $("#ie-new-sidebar").addClass("close")
+            $("#ie-new-sidebar").removeAttr("style")
+        });
+        $(".ie-content-pane").animate({ width: (width + sidebarWidth), marginLeft: (marginLeft - sidebarWidth) }, 350, function () {
+            resizeContent()
+        })
+
+    });
+    $("#sidebar-expand").click(function (e) {
+        const sidebarWidth = $("#ie-new-sidebar").width() - $("#ie-new-sidebar-collapse").width();
+        e.preventDefault();
+        const width = $(".ie-content-pane").width();
+        const marginLeft = parseInt($(".ie-content-pane").css('marginLeft'));
+
+        $("#ie-new-sidebar").animate({ width: 'toggle' }, 250, function () {
+            $('#ie-new-sidebar').css('display', 'flex');
+            $("#ie-new-sidebar-collapse").hide();
+            $("#ie-new-sidebar").removeClass("close")
+            $("#ie-new-sidebar").addClass("open")
+            setSidebarBottom();
+
+            if (sidebarScrollTopPosition != 0) {
+                $.cookie("sidebarScroll", sidebarScrollTopPosition, {
+                    path: "/ko-kr/trident-2207"
+                })
+                $("#ie-new-toc").scrollTop(sidebarScrollTopPosition);
+                sidebarScrollTopPosition = 0;
+            }
+        });
+        $(".ie-content-pane").animate({ width: (width - sidebarWidth), 'marginLeft': (marginLeft + sidebarWidth) }, 250, function () {
+            resizeContent()
+        })
+    });
+    function resizeContent() {
+        const sidebarWidth = $("#ie-new-sidebar").width() - $("#ie-new-sidebar-collapse").width();
+        const rightNavbarVisible =  $("#ie-right-navbar").css('display') && $("#ie-right-navbar").css('display') != 'none';
+        const sidebarVisible = $("#ie-new-sidebar").css('display') != 'none';
+        const rightNavbarWidth = $("#ie-right-navbar").width();
+        const rightNavbarCollapseWidth = $("#ie-right-navbar-collapse").width();
+        const rightNavbarCollapseVisible = $("#ie-right-navbar-collapse").css('display') && $("#ie-right-navbar-collapse").css('display') != 'none';
+        
+        if (rightNavbarVisible && sidebarVisible) {
+            $(".ie-content-pane").width(`calc(100% - ${sidebarWidth + rightNavbarWidth}px)`)
+            $(".ie-content-pane").css('marginLeft', `${sidebarWidth}px`)
+        } else if (sidebarVisible) {
+            $(".ie-content-pane").css('marginLeft', `${sidebarWidth}px`)
+            if (rightNavbarCollapseVisible) {
+                $(".ie-content-pane").width(`calc(100% - ${sidebarWidth + rightNavbarCollapseWidth}px)`)
+            } else {
+                $(".ie-content-pane").width(`calc(100% - ${$("#ie-new-sidebar").width()}px)`)
+            }
+
+        } else if (rightNavbarVisible) {
+            $(".ie-content-pane").css('marginLeft', `${$("#ie-new-sidebar-collapse").width()}px`)
+            $(".ie-content-pane").width(`calc(100% - ${rightNavbarWidth}px)`)
+        } else {
+            $(".ie-content-pane").css('marginLeft', `${$("#ie-new-sidebar-collapse").width()}px`)
+            if (rightNavbarCollapseVisible) {
+                $(".ie-content-pane").width(`calc(100% - ${rightNavbarCollapseWidth}px)`);
+            } else {
+                $(".ie-content-pane").width(`calc(100% - ${$("#ie-new-sidebar-collapse").width()}px) `);
+            }
+            
+        }
+    }
+    $(window).on("resize load", function () {
+        setSidebarBottom();
+        resizeContent()
+    });
+
+
+</script>
+
+<div class="ie-content-pane ie-component-detail-content ie-component-detail-content--show-code">
+    <!-- Begin of page container --><article class="page-content" id="main">
+      <!-- include utility.html -->
+      <div class="ie-info-disclaimer">
+    <span>
+      <div class="ie-info-disclaimer-container">
+        <div class="ie-info-disclaimer-icon">
+          <img src="/ko-kr/trident-2207/images/notification-icons.svg" class="luci-icon" alt="" />
+        </div>
+        <div class="ie-info-disclaimer-content">
+          <span> 본 한국어 번역은 사용자 편의를 위해 제공되는 기계 번역입니다. 영어 버전과 한국어 버전이 서로 어긋나는 경우에는 언제나 영어 버전이 우선합니다. </span>
+        </div>
+        <div style="clear:both;"></div>
+      </div>
+    </span>
+  </div><div class="ie-component-detail-heading-wrap">
+  <h1 class="ie-component-detail-heading">CSI 토폴로지를 사용합니다</h1>
+</div>
+
+<div id="ie-byline">
+  
+<div class="page-details">
+    
+        
+            <time datetime="2022-12-14 18:32:04 +0000">12/14/2022</time>
+        
+    
+    
+        <span>기여자
+        </span>
+    
+    
+</div>
+<div class="page-controls">
+    <div id="contribute-dropdown" class="custom-dropdown custom-dropdown-contrib" >
+        <div class="custom-dropdown-select custom-dropdown-select-contrib">
+        <span class="contrib-name"><img src="/ko-kr/trident-2207/images/discuss-sm.svg" alt="" class="github-icon" />변경 제안</span>
+        <img src="/ko-kr/trident-2207/images/dropdown-arrow.svg" alt="" class="custom-icon chevrondown invisible" />
+        <img src="/ko-kr/trident-2207/images/dropdown-arrow.svg" alt="" class="custom-icon chevronup" />
+        </div>
+        <ul class="custom-dropdown-menu suggested-changes-dropdown"><li>
+                <a target="_blank" href="https://github.com/NetAppDocs/trident-2207.ko-kr/issues/new?template=new-from-page.yml&page-url=https://docs.netapp.com/ko-kr/trident-2207/trident-use/csi-topology.html&page-title=CSI 토폴로지를 사용합니다" class="page-nav-contribute-link" role="button">문서 변경사항 요청</a>
+            </li><li> 
+                <a target="_blank" href="https://github.com/NetAppDocs/trident-2207/blob/main/trident-use/csi-topology.adoc" class="page-nav-contribute-link" role="button">이 페이지 편집</a>
+            </li><li><a target="_blank" href="https://docs.netapp.com/us-en/contribute/" class="page-nav-contribute-link"  >기여하는 방법 알아보기</a></li>
+        </ul>
+    </div>
+    <div id="pdf-control-container">
+        <div class="n-pdf-header">
+            <a id="toggleButtonPdf" class="n-pdf-button" type="button">
+                <img class="adobe-icon" src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>PDF<img src="/ko-kr/trident-2207/images/dropdown-arrow.svg" class="custom-icon" alt="" />
+            </a>
+        </div>
+        <div class="n-pdf-body-container">
+            <ul id="toggleContainerPdf" class="n-pdf-body" style="display:none;"><li class="pdf-ux-container">
+                    
+                    
+                    
+                    <a target="_blank" class="pdf-download-link" href="/ko-kr/trident-2207/pdfs/fullsite-sidebar/Astra_Trident_22_07_문서.pdf" >
+                    <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>이 문서 사이트의 PDF</a>
+
+
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/개념.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            개념
+          </a>
+          
+
+
+
+
+
+
+
+
+
+
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/시작하십시오.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            시작하십시오
+          </a>
+          
+
+
+
+
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/Trident_연산자를_사용하여_구축.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            Trident 연산자를 사용하여 구축
+          </a>
+          
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/tridentctl을_사용하여_배포합니다.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            tridentctl을 사용하여 배포합니다
+          </a>
+          
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/Astra_Trident_관리.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            Astra Trident 관리
+          </a>
+          
+
+
+
+
+
+
+
+
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/Astra_Trident를_사용해_보십시오.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            Astra Trident를 사용해 보십시오
+          </a>
+          
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/백엔드_구성.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            백엔드 구성
+          </a>
+          
+
+
+
+
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/ONTAP_SAN_드라이버를_사용하여_백엔드를_구성합니다.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            ONTAP SAN 드라이버를 사용하여 백엔드를 구성합니다
+          </a>
+          
+
+
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/ONTAP_NAS_드라이버를_사용하여_백엔드를_구성합니다.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            ONTAP NAS 드라이버를 사용하여 백엔드를 구성합니다
+          </a>
+          
+
+
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/볼륨_작업을_수행합니다.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            볼륨 작업을 수행합니다
+          </a>
+          
+    <ul class="subfolders" id="pdf-remove" style="display:none;"><li class="active"></li></ul>
+  
+
+
+
+
+
+
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/Docker를_위한_Astra_Trident.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            Docker를 위한 Astra Trident
+          </a>
+          
+
+
+
+
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/볼륨_작업.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            볼륨 작업
+          </a>
+          
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+
+
+
+
+
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+
+
+
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/모범_사례_및_권장사항.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            모범 사례 및 권장사항
+          </a>
+          
+
+
+
+
+
+
+
+
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+    
+      <ul class="subfolders" style="display:none;">
+        <li class="pdf-ux-container">
+          
+          
+          
+          <a target="_blank" class="pdf-download-link"
+            
+              href="/ko-kr/trident-2207/pdfs/sidebar/참조하십시오.pdf" 
+            
+          >
+            <img src="/ko-kr/trident-2207/images/pdf-icon.png" alt="" width="16" height="16"/>
+            참조하십시오
+          </a>
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </li>
+      </ul>
+    
+
+  
+
+
+
+
+
+</li></ul>
+            <div class="zip-pdf-link-container" style="display: none;">   
+                <a href="#" id="zipPdf">
+                <img src="/ko-kr/trident-2207/images/pdf-zip.png" alt="" width="16" height="16"/>
+                <pre>별도의 PDF 문서 모음<span class="zip-size"></span></pre>
+                </a><div id="zip-link-popup" class="hide">
+    <div class="inner-modal">
+        <div class="downloading-progress">
+            <div class="spinner"></div>
+            <h1>Creating your file...</h1>
+            <div>This may take a few minutes. Thanks for your patience.</div>
+            <button class="cancel-download-btn" type="button">Cancel</button>
+        </div>
+        <div class="download-complete hide">
+            <div class="done-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z"/></svg>
+            </div>
+            <div>Your file is ready</div>
+            <button class="cancel-download-btn" type="button">OK</button>
+        </div>
+    </div>
+</div>
+<script>
+    $(".cancel-download-btn").click(function(){
+        $("#zip-link-popup").addClass("hide");
+        $("#zip-link-popup .downloading-progress").removeClass("hide");
+        $("#zip-link-popup .download-complete").addClass("hide");
+    });
+</script></div>
+        </div>
+    </div>        
+<script>
+$("#toggleContainerPdf li.active:last-child").parents('ul.subfolders').toggle('display');
+$("#toggleButtonPdf").on('click', function(e){ 
+    e.stopPropagation();
+    $("#toggleContainerPdf").toggle('display');
+    $(".n-pdf-body-container .zip-pdf-link-container").toggle('display');
+});
+
+//hide is by clicking outside pdfcontainer
+$(document).on('click', function (e) {
+    if ($('#toggleContainerPdf').is(':visible') && !$('.n-pdf-body-container').is(e.target) && !$('.n-pdf-body-container').has(e.target).length)  {
+        
+        $("#toggleContainerPdf").toggle('display');
+        $(".n-pdf-body-container .zip-pdf-link-container").toggle('display');
+        $("#toggleButtonPdf").removeClass("active");
+    }
+});
+</script>
+<script>
+    function getPdfLocation() {
+        const pdfLocation = window.scrollX + document.querySelector('#pdf-control-container').getBoundingClientRect().left
+        if (pdfLocation < 450) {
+            $(".n-pdf-body-container").addClass("block")
+        } else {
+            $(".n-pdf-body-container").removeClass("block")
+        }
+    
+    }
+    $( window ).on( "resize", function() {
+        getPdfLocation()
+} );
+</script>
+<script>
+    const pdfButtonWidth =  $(".n-pdf-header").width();
+    const pdfMenuWidth = $(".n-pdf-body-container").width();
+    $(".n-pdf-body-container").css('margin-left', `calc(${pdfButtonWidth - pdfMenuWidth}px)`);
+</script>
+</div>
+
+    
+
+</div>
+
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Astra Trident는 을 사용하여 Kubernetes 클러스터에 있는 노드를 선택적으로 생성하여 연결할 수 있습니다 <a href="https://kubernetes-csi.github.io/docs/topology.html" target="_blank" rel="noopener">"CSI 토폴로지 기능"</a>. CSI 토폴로지 기능을 사용하면 지역 및 가용성 영역에 따라 볼륨에 대한 액세스가 노드의 하위 집합으로 제한될 수 있습니다. 오늘날의 클라우드 공급자는 Kubernetes 관리자가 영역 기반의 노드를 생성할 수 있습니다. 노드는 지역 내 또는 여러 지역의 여러 가용성 영역에 위치할 수 있습니다. Astra Trident는 다중 영역 아키텍처에서 워크로드용 볼륨 프로비저닝을 지원하기 위해 CSI 토폴로지를 사용합니다.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<img src="/us-en/trident-2207/images/tip.svg" alt="팁">
+</td>
+<td class="content">
+CSI 토폴로지 기능에 대해 자세히 알아보십시오 <a href="https://kubernetes.io/blog/2018/10/11/topology-aware-volume-provisioning-in-kubernetes/" target="_blank" rel="noopener">"여기"</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Kubernetes는 두 가지 고유한 볼륨 바인딩 모드를 제공합니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>와 함께 <code>VolumeBindingMode</code> 를 로 설정합니다 <code>Immediate</code>, Astra Trident는 토폴로지 인식 없이 볼륨을 생성합니다. 볼륨 바인딩 및 동적 프로비저닝은 PVC가 생성될 때 처리됩니다. 이것이 기본값입니다 <code>VolumeBindingMode</code> 또한 토폴로지 제약 조건을 적용하지 않는 클러스터에 적합합니다. 영구 볼륨은 요청 포드의 예약 요구 사항에 의존하지 않고 생성됩니다.</p>
+</li>
+<li>
+<p>와 함께 <code>VolumeBindingMode</code> 를 로 설정합니다 `WaitForFirstConsumer`PVC에 대한 영구 볼륨의 생성 및 바인딩은 PVC를 사용하는 POD가 예약 및 생성될 때까지 지연됩니다. 이렇게 하면 토폴로지 요구 사항에 따라 적용되는 일정 제한을 충족하기 위해 볼륨이 생성됩니다.</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<img src="/us-en/trident-2207/images/note.svg" alt="참고">
+</td>
+<td class="content">
+를 클릭합니다 <code>WaitForFirstConsumer</code> 바인딩 모드에서는 토폴로지 레이블이 필요하지 않습니다. 이 기능은 CSI 토폴로지 기능과 독립적으로 사용할 수 있습니다.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<div class="title">필요한 것</div>
+<p>CSI 토폴로지를 사용하려면 다음이 필요합니다.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>1.19-1.24를 실행하는 Kubernetes 클러스터</p>
+<div class="listingblock">
+<div class="content">
+<pre>kubectl version
+Client Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.3", GitCommit:"1e11e4a2108024935ecfcb2912226cedeafd99df", GitTreeState:"clean", BuildDate:"2020-10-14T12:50:19Z", GoVersion:"go1.15.2", Compiler:"gc", Platform:"linux/amd64"}
+Server Version: version.Info{Major:"1", Minor:"19", GitVersion:"v1.19.3", GitCommit:"1e11e4a2108024935ecfcb2912226cedeafd99df", GitTreeState:"clean", BuildDate:"2020-10-14T12:41:49Z", GoVersion:"go1.15.2", Compiler:"gc", Platform:"linux/amd64"}</pre>
+</div>
+</div>
+</li>
+<li>
+<p>클러스터의 노드에는 토폴로지를 인식하는 레이블이 있어야 합니다 (<code>topology.kubernetes.io/region</code> 및 <code>topology.kubernetes.io/zone</code>)를 클릭합니다. Astra Trident가 토폴로지 인식을 위해 설치되기 전에 클러스터의 노드에 이러한 레이블 * 이 있어야 합니다.</p>
+<div class="listingblock">
+<div class="content">
+<pre>kubectl get nodes -o=jsonpath='{range .items[*]}[{.metadata.name}, {.metadata.labels}]{"\n"}{end}' | grep --color "topology.kubernetes.io"
+[node1, {"beta.kubernetes.io/arch":"amd64","beta.kubernetes.io/os":"linux","kubernetes.io/arch":"amd64","kubernetes.io/hostname":"node1","kubernetes.io/os":"linux","node-role.kubernetes.io/master":"","topology.kubernetes.io/region":"us-east1","topology.kubernetes.io/zone":"us-east1-a"}]
+[node2, {"beta.kubernetes.io/arch":"amd64","beta.kubernetes.io/os":"linux","kubernetes.io/arch":"amd64","kubernetes.io/hostname":"node2","kubernetes.io/os":"linux","node-role.kubernetes.io/worker":"","topology.kubernetes.io/region":"us-east1","topology.kubernetes.io/zone":"us-east1-b"}]
+[node3, {"beta.kubernetes.io/arch":"amd64","beta.kubernetes.io/os":"linux","kubernetes.io/arch":"amd64","kubernetes.io/hostname":"node3","kubernetes.io/os":"linux","node-role.kubernetes.io/worker":"","topology.kubernetes.io/region":"us-east1","topology.kubernetes.io/zone":"us-east1-c"}]</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="1단계-토폴로지-인식-백엔드-생성">1단계: 토폴로지 인식 백엔드 생성</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Astra Trident 스토리지 백엔드는 가용성 영역에 따라 볼륨을 선택적으로 프로비저닝하도록 설계할 수 있습니다. 각 백엔드에는 선택 사항이 포함될 수 있습니다 <code>supportedTopologies</code> 지원해야 하는 영역 및 영역 목록을 나타내는 블록입니다. 이러한 백엔드를 사용하는 StorageClasses의 경우 지원되는 영역/영역에서 예약된 애플리케이션에서 요청하는 경우에만 볼륨이 생성됩니다.</p>
+</div>
+<div class="paragraph">
+<p>다음은 백엔드 정의의 예입니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+ "version": 1,
+ "storageDriverName": "ontap-san",
+ "backendName": "san-backend-us-east1",
+ "managementLIF": "192.168.27.5",
+ "svm": "iscsi_svm",
+ "username": "admin",
+ "password": "xxxxxxxxxxxx",
+ "supportedTopologies": [
+{"topology.kubernetes.io/region": "us-east1", "topology.kubernetes.io/zone": "us-east1-a"},
+{"topology.kubernetes.io/region": "us-east1", "topology.kubernetes.io/zone": "us-east1-b"}
+]
+}</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<img src="/us-en/trident-2207/images/note.svg" alt="참고">
+</td>
+<td class="content">
+<code>supportedTopologies</code> 백엔드 당 지역 및 영역 목록을 제공하는 데 사용됩니다. 이러한 영역 및 영역은 StorageClass 에서 제공할 수 있는 허용 가능한 값의 목록을 나타냅니다. 백엔드에서 제공되는 지역 및 영역의 하위 집합이 포함된 StorageClasses의 경우 Astra Trident는 백엔드에 볼륨을 생성합니다.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>을 정의할 수 있습니다 <code>supportedTopologies</code> 스토리지 풀당 다음 예를 참조하십시오.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{"version": 1,
+"storageDriverName": "ontap-nas",
+"backendName": "nas-backend-us-central1",
+"managementLIF": "172.16.238.5",
+"svm": "nfs_svm",
+"username": "admin",
+"password": "Netapp123",
+"supportedTopologies": [
+      {"topology.kubernetes.io/region": "us-central1", "topology.kubernetes.io/zone": "us-central1-a"},
+      {"topology.kubernetes.io/region": "us-central1", "topology.kubernetes.io/zone": "us-central1-b"}
+    ]
+"storage": [
+   {
+       "labels": {"workload":"production"},
+        "region": "Iowa-DC",
+        "zone": "Iowa-DC-A",
+        "supportedTopologies": [
+            {"topology.kubernetes.io/region": "us-central1", "topology.kubernetes.io/zone": "us-central1-a"}
+        ]
+    },
+    {
+        "labels": {"workload":"dev"},
+         "region": "Iowa-DC",
+         "zone": "Iowa-DC-B",
+         "supportedTopologies": [
+             {"topology.kubernetes.io/region": "us-central1", "topology.kubernetes.io/zone": "us-central1-b"}
+         ]
+     }
+]
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>이 예에서 는 입니다 <code>region</code> 및 <code>zone</code> 레이블은 스토리지 풀의 위치를 나타냅니다. <code>topology.kubernetes.io/region</code> 및 <code>topology.kubernetes.io/zone</code> 스토리지 풀을 사용할 수 있는 위치를 지정합니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="2단계-토폴로지를-인식하는-storageclasses를-정의합니다">2단계: 토폴로지를 인식하는 StorageClasses를 정의합니다</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>클러스터의 노드에 제공되는 토폴로지 레이블을 기반으로 StorageClasses를 정의하여 토폴로지 정보를 포함할 수 있습니다. 이렇게 하면 PVC 요청에 대한 후보 역할을 하는 스토리지 풀과 Trident에서 제공하는 볼륨을 사용할 수 있는 노드의 하위 세트가 결정됩니다.</p>
+</div>
+<div class="paragraph">
+<p>다음 예를 참조하십시오.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+name: netapp-san-us-east1
+provisioner: csi.trident.netapp.io
+volumeBindingMode: WaitForFirstConsumer
+allowedTopologies:
+- matchLabelExpressions:
+- key: topology.kubernetes.io/zone
+  values:
+  - us-east1-a
+  - us-east1-b
+- key: topology.kubernetes.io/region
+  values:
+  - us-east1
+parameters:
+  fsType: "ext4"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>위에서 제공한 StorageClass 정의에서 <code>volumeBindingMode</code> 가 로 설정되어 있습니다 <code>WaitForFirstConsumer</code>. 이 StorageClass에 요청된 PVC는 POD에서 참조될 때까지 작동하지 않습니다. 그리고, <code>allowedTopologies</code> 사용할 영역 및 영역을 제공합니다. 를 클릭합니다 <code>netapp-san-us-east1</code> StorageClass가 에 PVC를 생성합니다 <code>san-backend-us-east1</code> 백엔드가 위에서 정의되었습니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="3단계-pvc-생성-및-사용">3단계: PVC 생성 및 사용</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>StorageClass가 생성되어 백엔드에 매핑되면 PVC를 생성할 수 있습니다.</p>
+</div>
+<div class="paragraph">
+<p>예를 참조하십시오 <code>spec</code> 아래:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+name: pvc-san
+spec:
+accessModes:
+  - ReadWriteOnce
+resources:
+  requests:
+    storage: 300Mi
+storageClassName: netapp-san-us-east1</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>이 매니페스트를 사용하여 PVC를 만들면 다음과 같은 결과가 발생합니다.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>kubectl create -f pvc.yaml
+persistentvolumeclaim/pvc-san created
+kubectl get pvc
+NAME      STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS          AGE
+pvc-san   Pending                                      netapp-san-us-east1   2s
+kubectl describe pvc
+Name:          pvc-san
+Namespace:     default
+StorageClass:  netapp-san-us-east1
+Status:        Pending
+Volume:
+Labels:        &lt;none&gt;
+Annotations:   &lt;none&gt;
+Finalizers:    [kubernetes.io/pvc-protection]
+Capacity:
+Access Modes:
+VolumeMode:    Filesystem
+Mounted By:    &lt;none&gt;
+Events:
+  Type    Reason                Age   From                         Message
+  ----    ------                ----  ----                         -------
+  Normal  WaitForFirstConsumer  6s    persistentvolume-controller  waiting for first consumer to be created before binding</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Trident에서 볼륨을 생성하여 PVC에 바인딩하려면 POD에서 PVC를 사용합니다. 다음 예를 참조하십시오.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod-1
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: topology.kubernetes.io/region
+            operator: In
+            values:
+            - us-east1
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: topology.kubernetes.io/zone
+            operator: In
+            values:
+            - us-east1-a
+            - us-east1-b
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 3000
+    fsGroup: 2000
+  volumes:
+  - name: vol1
+    persistentVolumeClaim:
+      claimName: pvc-san
+  containers:
+  - name: sec-ctx-demo
+    image: busybox
+    command: [ "sh", "-c", "sleep 1h" ]
+    volumeMounts:
+    - name: vol1
+      mountPath: /data/demo
+    securityContext:
+      allowPrivilegeEscalation: false</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>이 podSpec은 에 있는 노드에서 Pod를 예약하도록 Kubernetes에 지시합니다 <code>us-east1</code> 영역 을 클릭하고 에 있는 노드 중에서 선택합니다 <code>us-east1-a</code> 또는 <code>us-east1-b</code> 존.</p>
+</div>
+<div class="paragraph">
+<p>다음 출력을 참조하십시오.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>kubectl get pods -o wide
+NAME        READY   STATUS    RESTARTS   AGE   IP               NODE              NOMINATED NODE   READINESS GATES
+app-pod-1   1/1     Running   0          19s   192.168.25.131   node2             &lt;none&gt;           &lt;none&gt;
+kubectl get pvc -o wide
+NAME      STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS          AGE   VOLUMEMODE
+pvc-san   Bound    pvc-ecb1e1a0-840c-463b-8b65-b3d033e2e62b   300Mi      RWO            netapp-san-us-east1   48s   Filesystem</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="포함할-백엔드를-업데이트합니다-supportedtopologies">포함할 백엔드를 업데이트합니다 <code>supportedTopologies</code></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>기존 백엔드는 목록을 포함하도록 업데이트할 수 있습니다 <code>supportedTopologies</code> 사용 <code>tridentctl backend update</code>. 이는 이미 프로비저닝된 체적에 영향을 주지 않으며 후속 PVC에만 사용됩니다.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="자세한-내용을-확인하십시오">자세한 내용을 확인하십시오</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/" target="_blank" rel="noopener">"컨테이너에 대한 리소스를 관리합니다"</a></p>
+</li>
+<li>
+<p><a href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector" target="_blank" rel="noopener">"노드 선택기"</a></p>
+</li>
+<li>
+<p><a href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity" target="_blank" rel="noopener">"친화성 및 반친화성"</a></p>
+</li>
+<li>
+<p><a href="https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/" target="_blank" rel="noopener">"오염과 내약입니다"</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+    </article>
+    <!-- Page Container -->
+  </div>
+
+  
+  <!-- Start Page Toolbar -->
+<div id="ie-right-navbar-collapse" class="close">
+  <img id="navbar-expand" class="ie-searchbox-icon" src="/ko-kr/trident-2207/images/double_arrow.svg" alt="" />
+</div>
+<div id="ie-right-navbar" class="open">
+  <div id="right-navbar-collapse">
+    <img src="/ko-kr/trident-2207/images/double_arrow.svg" alt="" />
+  </div>
+  <div class="page-nav-container">
+    <nav class="page-nav-fixed">
+      <div class="page-nav-title">이 페이지에서</div>
+      <div class="page-nav-links">
+        <ul class="page-nav-inner" id="page-menu"></ul>
+      </div>
+    </nav>
+  </div>
+</div>
+
+
+<script>
+  resizeContent();
+  function setRightBarHeight() {
+    var h = 0;
+
+    // header 1
+    h += PXinViewport($('.n-footer'));
+    h += PXinViewport($('#ie-new-header'));
+
+    if ($('#ie-right-navbar').length) {
+      $('#ie-right-navbar').css({ height: `calc(100vh - ${h}px)` });
+    }
+    if ($('.page-nav-links').length) {
+      h += 98;
+      $('.page-nav-links').css({ height: `calc(100vh - ${h}px)` });
+    }
+  }
+
+  $(document).ready(function () {
+    // PAGE NAV - Click
+    const MASTHEAD_OFFSET = 65;
+    const SECTIONS = $("main h2, main h3");
+    let calculateActiveSection = false;
+    setTimeout(() => {
+      calculateActiveSection = true;
+    }, 100)
+
+    $(".page-nav__link").click(function (event) {
+      calculateActiveSection = false;
+      $(".page-nav__link").removeClass('page-nav__link--active');
+      var target = $(event.target);
+      target.addClass('page-nav__link--active');
+      location.hash = event.target.hash;
+      setTimeout(() => {
+        calculateActiveSection = true;
+      }, 100)
+
+    });
+
+    // PAGE NAV - Scroll
+    $(window).on('resize scroll', function () {
+      if (calculateActiveSection) {
+        var activeSection = getActiveSection(SECTIONS, MASTHEAD_OFFSET);
+        if (activeSection) {
+          var activeHref = $(activeSection).attr('id');
+          $(".page-nav__link").removeClass('page-nav__link--active');
+          $("#page-menu a[href=#" + activeHref + "]").addClass('page-nav__link--active');
+          if (location.hash != "#" + activeHref) {
+            if (history.replaceState) {
+              history.replaceState(null, null, "#" + activeHref);
+            }
+          }
+        }
+      }
+    });
+
+    $(".n-pdf-button").click(function () {
+      $(this).toggleClass("active");
+    });
+
+    $.fn.isVisibleAndInViewport = function () {
+      var elementTop = $(this).offset().top;
+      var elementBottom = elementTop + $(this).outerHeight();
+
+      var viewportTop = $(window).scrollTop();
+      var viewportBottom = viewportTop + $(window).height();
+
+      return elementBottom > viewportTop && elementTop < viewportBottom && $(this).is(":visible");
+    };
+
+
+    $(window).on('resize scroll', function () {
+      setRightBarHeight();
+    });
+
+    $(window).trigger('resize');
+
+
+  });
+
+  $("#right-navbar-collapse").click(function (e) {
+    const rightNavbarWidth = $("#ie-right-navbar").width() - $("#ie-right-navbar-collapse").width();
+    e.preventDefault();
+    const width = $(".ie-content-pane").width();
+
+    $("#ie-right-navbar").animate({ width: 'toggle' }, 350, function () {
+      $("#ie-right-navbar-collapse").removeClass("close")
+      $("#ie-right-navbar-collapse").addClass("open")
+      $("#ie-right-navbar").removeClass("open")
+      $("#ie-right-navbar").addClass("close")
+    });
+    $(".ie-content-pane").animate({ width: (width + rightNavbarWidth) }, 350, function () {
+      resizeContent()
+      setSidebarBottom();
+    })
+
+  });
+  $("#navbar-expand").click(function (e) {
+    const rightNavbarWidth = $("#ie-right-navbar").width() - $("#ie-right-navbar-collapse").width();
+    e.preventDefault();
+    const width = $(".ie-content-pane").width();
+    $("#ie-right-navbar").animate({ width: 'toggle' }, 250, function () {
+      $("#ie-right-navbar-collapse").removeClass("open")
+      $("#ie-right-navbar-collapse").addClass("close")
+      $("#ie-right-navbar").removeClass("close")
+      $("#ie-right-navbar").addClass("open")
+      setRightBarHeight();
+      setSidebarBottom();
+    });
+    $(".ie-content-pane").animate({ width: (width - rightNavbarWidth) }, 250, function () {
+      resizeContent()
+    })
+  });
+
+  function navbarResize() {
+    const rightNavbarResized = $("#ie-right-navbar-collapse").hasClass('resized');
+    if (window.innerWidth < 1024) {
+      $("#ie-right-navbar").removeClass("open")
+      $("#ie-right-navbar").addClass("close")
+      $("#ie-right-navbar").removeAttr("style")
+      $("#ie-right-navbar-collapse").removeClass("close")
+      $("#ie-right-navbar-collapse").addClass("open")
+      $("#ie-right-navbar-collapse").addClass("resized")
+    } else {
+      if (rightNavbarResized) {
+        $('#ie-right-navbar').removeClass('close');
+        $('#ie-right-navbar').addClass('open');
+        $("#ie-right-navbar-collapse").removeClass("resized")
+        $("#ie-right-navbar-collapse").removeClass("open")
+        $("#ie-right-navbar-collapse").addClass("close")
+      }
+    }
+    resizeContent()
+  }
+  navbarResize();
+  $(window).on('resize load', function () {
+    navbarResize()
+  });
+
+  function getActiveSection(sections, offset) {
+    var scrollPosition = $(window).scrollTop() + offset + 5;
+    var activeSection;
+    for (var i = 0; i < sections.length; i++) {
+      var el = $(sections[i]);
+      var activePosition = el.offset().top;
+      if (activePosition > scrollPosition) {
+        break;
+      }
+
+      activeSection = sections[i];
+    }
+
+    return activeSection;
+  }
+
+  $("a[href*=#]:not([href=#])").click(function () {
+    setTimeout(() => {
+      $(window).trigger('scroll');
+    }, 105)
+  })
+
+  const hashOnLoad = location.href.split("#")[1];
+  setTimeout(function () {
+    if (hashOnLoad) {
+      $(".page-nav__link").removeClass('page-nav__link--active');
+      $("#page-menu a[href=#" + hashOnLoad + "]").addClass('page-nav__link--active');
+    }
+  }, 100)
+
+</script>
+
+
+  <div style="clear: both"></div><!-- Main needs to have height --></div>
+
+        </main>
+
+        <footer class="n-footer">
+  <div class="n-footer__bottom">
+    <div class="n-container">
+        <div class="n-footer__left">
+          <li class="n-footer__copyright-link">
+                    <a href="https://www.netapp.com/company/legal/copyright/">© 2023 NetApp, Inc.</a>
+          </li>
+        </div>
+        <div class="n-footer__center">
+          <ul class="n-footer__copyright-list">
+            <li class="n-footer__copyright-link">
+              <a href="https://www.netapp.com/company/legal/terms-of-use/">이용 약관</a>
+            </li>
+            <li class="n-footer__copyright-link">
+              <a href="https://www.netapp.com/company/legal/privacy-policy/">개인 정보 보호 정책</a>
+            </li>
+            <li class="n-footer__copyright-link">
+              <a href="https://www.netapp.com/company/legal/cookie-policy/">쿠키 정책</a>
+            </li>
+            <li class="n-footer__copyright-link">
+              <a class="ot-sdk-show-settings">쿠키 설정</a>
+            </li>
+          </ul>
+       </div>
+        <div class="n-footer__right">
+              <li class="n-footer__copyright-link">
+                <a target="_self" href="javascript:netapp_mailto()">이 페이지에 대한 피드백 보내기</a>
+              </li>
+        </div>
+     </div>
+  </div>
+</footer>
+
+      </div><!-- Elasticsearch JS -->
+      <script type="text/javascript" src='/ko-kr/trident-2207/js/bundle.js'></script>
+
+      <!-- Syntax Highlighting -->
+      <script type="text/javascript" src='/ko-kr/trident-2207/js/prism.js'></script>
+      <script type="text/javascript" src='/ko-kr/trident-2207/js/prism-curl.js'></script>
+    </div>
+    <script>
+      document.body.offsetWidth=1903;
+      cookieLaw = {}
+      cookieLaw.euCountry = "US";
+      cookieLaw.invoke = function(){return false;}
+    </script>
+    <script src='/ko-kr/trident-2207/js/ie-tabbed-blocks.js'></script>
+    <script src='/ko-kr/trident-2207/js/ie-sidebar.js'></script>
+  </body>
+
+</html>
