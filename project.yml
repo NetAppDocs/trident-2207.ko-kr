@@ -8,11 +8,22 @@ settings:
     pdf_enabled: true
     harmony_enabled: false
   rss_page: trident-rn.html
+  downlevel: true
   versions:
   - version-number: '22.07'
     url: "/trident-2207"
-  - version-number: '23.07'
+  - version-number: '24.02'
     url: "/trident"
+  - version-number: '23.10'
+    url: "/trident-2310"
+  - version-number: '23.07'
+    url: "/trident-2307"
+  - version-number: '23.04'
+    url: "/trident-2304"
+  - version-number: '23.01'
+    url: "/trident-2301"
+  - version-number: '22.10'
+    url: "/trident-2210"
   - version-number: '22.04'
     url: "/trident-2204"
   - version-number: '22.01'
