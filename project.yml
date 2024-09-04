@@ -30,8 +30,6 @@ settings:
     url: "/trident-2201"
   - version-number: '21.10'
     url: "/trident-2110"
-  - version-number: '21.07'
-    url: "/trident-2107"
   langs: ko-kr,us-en,ja-jp,zh-cn,zh-tw,de-de,es-es,fr-fr,it-it
 sidebar:
   entries:
