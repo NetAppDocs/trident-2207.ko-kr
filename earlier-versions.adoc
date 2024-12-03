@@ -16,5 +16,4 @@ Astra Trident 22.07을 실행하지 않는 경우 이전 릴리스에 대한 문
 
 * https://docs.netapp.com/us-en/trident-2204/index.html["Astra Trident 22.04"^]
 * https://docs.netapp.com/us-en/trident-2201/index.html["Astra Trident 22.01"^]
-* https://docs.netapp.com/us-en/trident-2110/index.html["Astra Trident 21.10"^]
 
