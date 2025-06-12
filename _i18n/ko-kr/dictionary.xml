@@ -1030,10 +1030,6 @@
   <block id="fdd380631ba8063e7b8f842282a01e40" category="list-text"><block ref="fdd380631ba8063e7b8f842282a01e40" category="inline-link-rx"></block></block>
   <block id="4af8991c21dff2f779496b8350d1124b" category="inline-link">Astra Trident 22.01</block>
   <block id="7669b0b69333e81c7c208aea3d1a3c6f" category="list-text"><block ref="7669b0b69333e81c7c208aea3d1a3c6f" category="inline-link-rx"></block></block>
-  <block id="cce172403b73af5c2a4e93081affcc7f" category="inline-link">Astra Trident 21.10</block>
-  <block id="606b9e83fb467a43b3065d4fd5037094" category="list-text"><block ref="606b9e83fb467a43b3065d4fd5037094" category="inline-link-rx"></block></block>
-  <block id="a93e9e44b7a375a4236260f5ff2b251e" category="inline-link">Astra Trident 21.07</block>
-  <block id="3830d427e146a8a64454dc373d9b1502" category="list-text"><block ref="3830d427e146a8a64454dc373d9b1502" category="inline-link-rx"></block></block>
   <block id="c217b0ac2dd5504f79ba78b220a9c358" category="summary">NetApp은 다양한 방법으로 Trident를 지원합니다. 불협화채널 등 광범위한 자아 지원 옵션이 연중 무휴로 제공됩니다.</block>
   <block id="db5eb84117d06047c97c9a0191b5fffe" category="doc">지원</block>
   <block id="14340f3a4eb25a54f8446036d807d7c8" category="paragraph">Astra Trident는 공식적으로 지원되는 NetApp 프로젝트입니다. 표준 메커니즘을 사용하여 NetApp에 연락하면 필요한 엔터프라이즈급 지원을 받을 수 있습니다.</block>
@@ -1166,7 +1162,6 @@
   <block id="d0b19d36be2c5f16e9aef46c8a452d3d" category="paragraph">NetApp 소유 특허 목록은 다음 사이트에서 확인할 수 있습니다.</block>
   <block id="56c34c6410dd45c5cec44149ad0ce037" category="section-title">개인 정보 보호 정책</block>
   <block id="c0227cef6f07a8cd2ac72f2945b031aa" category="section-title">오픈 소스</block>
-  <block id="0172b29a9f5d94dc62ee592a98183f3b" category="paragraph">각 릴리스의 공지 파일에서 Astra Trident용 NetApp 소프트웨어에 사용된 타사 저작권 및 라이센스를 검토할 수 있습니다<block ref="4a3c8c5a408c6db1c44c04391a8a0a2f" category="inline-link-rx"></block>.</block>
   <block id="b9966b5f76510c4c81d397b732dc0ced" category="summary">지원되는 프런트엔드, 백엔드 및 호스트 구성을 검토하여 시작하십시오.</block>
   <block id="5a2ebfb8baa378cfcfcba58bbb1380c2" category="doc">요구 사항</block>
   <block id="0582c93c9857a8b6d0380be79128eefc" category="admonition">Astra Trident가 사용하는 포트에 대한 자세한 내용은 를 참조하십시오 <block ref="c6b87a878d50568ac1e654ad3964af7b" category="inline-link-macro-rx"></block>.</block>
@@ -3274,4 +3269,6 @@
   <block id="f8b52d963f246a75dc6c8b78c954a4fd" category="list-text"><block ref="f8b52d963f246a75dc6c8b78c954a4fd" category="inline-link-rx"></block></block>
   <block id="b6780b7b2561935ff862fe7126cde751" category="list-text"><block ref="b6780b7b2561935ff862fe7126cde751" category="inline-link-rx"></block></block>
   <block id="b9a641d903e611a87a5e68ac7fdb0b84" category="list-text">Trident AutoSupport는 개인 식별 정보(PII) 또는 개인 정보를 수집하거나 전송하지 않습니다. 에는 Trident 컨테이너 이미지 자체에 적용할 수 없는 가<block ref="173a360b412944768c2ab13e6c8fd1c7" category="inline-link-rx"></block> 포함되어 있습니다. 데이터 보안 및 신뢰에 대한 NetApp의 노력에 대해 더 자세히 알아볼 수<block ref="d3cc55401bc8303e01c6b0c43ba0733f" category="inline-link-rx"></block>있습니다.</block>
+  <block id="9b73989307c1975dfa4d5e1581e4afe8" category="paragraph">통지 파일은 NetApp 소프트웨어에 사용된 타사의 저작권 및 라이센스에 대한 정보를 제공합니다.</block>
+  <block id="b2c5fe74ce5fe4b418e2c888873cdad2" category="paragraph"><block ref="6cd62921a12aa45126e024256eb76da4" category="inline-link-rx"></block>..</block>
 </blocks>
